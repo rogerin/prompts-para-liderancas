@@ -1,6 +1,6 @@
-# Conselho em Simulação
+# Workshop KeyCore Academy — IA, Dados e Decisão
 
-Workshop da KeyCore Tech Hub: IA, dados e decisões C-Level.
+Workshop da KeyCore Academy: IA, dados e decisões C-Level.
 
 ## Proposta
 Uma experiência prática de 2h30 em que participantes usam uma base histórica fictícia da empresa Núcleo Casa para construir prompts, investigar dados sob perspectivas C-Level, especificar dashboards e simular uma reunião de conselho.
