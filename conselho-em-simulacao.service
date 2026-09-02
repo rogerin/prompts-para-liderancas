@@ -1,0 +1,14 @@
+[Unit]
+Description=Conselho em Simulação workshop KeyCore
+After=network.target
+
+[Service]
+Type=simple
+WorkingDirectory=/home/keyla/hermes-workspace/conselho-em-simulado
+ExecStart=/usr/bin/python3 -m http.server 8101 --bind 127.0.0.1
+Restart=always
+RestartSec=3
+User=keyla
+
+[Install]
+WantedBy=multi-user.target
