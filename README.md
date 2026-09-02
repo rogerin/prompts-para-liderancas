@@ -1,4 +1,6 @@
-# Workshop KeyCore Academy — IA, Dados e Decisão
+# Prompts para Lideranças
+
+## Do Dado à Decisão
 
 Workshop da KeyCore Academy: IA, dados e decisões C-Level.
 
