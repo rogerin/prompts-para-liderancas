@@ -1,14 +1,18 @@
 [Unit]
-Description=Conselho em Simulação workshop KeyCore
+Description=KeyCore Academy - Workshop interativo
 After=network.target
 
 [Service]
 Type=simple
-WorkingDirectory=/home/keyla/hermes-workspace/conselho-em-simulado
-ExecStart=/usr/bin/python3 -m http.server 8101 --bind 127.0.0.1
-Restart=always
-RestartSec=3
 User=keyla
+WorkingDirectory=/home/keyla/hermes-workspace/conselho-em-simulado
+EnvironmentFile=/etc/keycore-workshop.env
+ExecStart=/home/keyla/hermes-workspace/conselho-em-simulado/.venv/bin/python -m uvicorn app:app --host 127.0.0.1 --port 8101 --workers 1
+Restart=on-failure
+RestartSec=3
+UMask=0077
+NoNewPrivileges=true
+PrivateTmp=true
 
 [Install]
 WantedBy=multi-user.target
