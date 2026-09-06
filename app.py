@@ -66,8 +66,8 @@ def create_app(data_dir: Path | None = None, password: str | None = None,
         return connection
 
     def initialise() -> None:
-        if len(password or '') < 16 or (password or '').startswith('SUBSTITUA_'):
-            raise RuntimeError('Defina FACILITATOR_PASSWORD com no mínimo 16 caracteres. Use scripts/start_local.py para iniciar localmente.')
+        if not (password or '').strip() or (password or '').startswith('SUBSTITUA_'):
+            raise RuntimeError('Defina FACILITATOR_PASSWORD antes de iniciar o servidor.')
         folder.mkdir(parents=True, exist_ok=True, mode=0o700)
         uploads.mkdir(parents=True, exist_ok=True, mode=0o700)
         with db() as c:
