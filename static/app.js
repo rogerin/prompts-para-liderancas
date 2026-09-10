@@ -8,6 +8,11 @@
   const exerciseById = id => C.exercises.find(e=>e.id===id);
   const S = {index:0, backend:false, role:'guest', room:null, rooms:[], follow:true, source:null, poll:null, panel:'', activity:'', galleryScope:'gallery', galleryExercise:'', galleryItems:[], selected:new Set(), compare:false, libraryCategory:'', libraryQuery:'', promptId:'P01', busy:false, retention:7, timer:0};
   const panel = $('#panel');
+  const detailPanel = $('#detail-panel');
+  let detailState=null, lastPresentation, roomChanges=Promise.resolve();
+  let localTimer=null, clockOffset=0, countdownInterval=null, timerMarkup='';
+  let audioContext=null;
+  const alarmedTimers=new Set();
   let galleryPending=false, galleryLoading=false, galleryRequest=0, galleryRevision=-1;
   let toastTimer;
   function toast(message) { $('#toast').textContent=message; $('#toast').classList.add('show'); clearTimeout(toastTimer); toastTimer=setTimeout(()=>$('#toast').classList.remove('show'),7000); }
@@ -31,43 +36,170 @@
     $('#room-label').textContent=S.room?`${S.room.title} · ${S.room.registered} inscritos${S.room.closed?' · encerrada':''}`:'33 prompts · caso 100% fictício';
     const follow=$('#follow');follow.hidden=!(S.room&&S.role==='student');follow.textContent=S.follow?'Ao vivo · Pausar acompanhamento':'Exploração livre · Voltar ao vivo';
   }
+  // Serialize presenter commands so quick clicks cannot publish an older selection last.
+  function updateRoom(changes) {
+    const code=S.room?.code;
+    const task=roomChanges.catch(()=>{}).then(async()=>{
+      if(!code||S.room?.code!==code||S.role!=='presenter')throw new Error('Entre como facilitador nesta sala.');
+      for(let attempt=0;attempt<3;attempt++) {
+        try {
+          const room=await api(`/api/rooms/${code}`,{method:'PATCH',body:{...changes,version:S.room.version}});
+          if(S.room?.code===code)receiveState(room);
+          return room;
+        } catch(error) {
+          if(error.status!==409||attempt===2)throw error;
+          const room=await api(`/api/rooms/${code}`);
+          if(S.room?.code!==code)throw new Error('A sala atual mudou.');
+          receiveState(room);
+        }
+      }
+    });
+    roomChanges=task;return task;
+  }
+  function exploreLocally() {if(S.room&&S.role==='student'){S.follow=false;syncHeader();}}
+  function showDetail(detail) {
+    const slide=C.slides.find(s=>s.id===detail?.slide);
+    if(!slide)return;
+    captureDraft();
+    const sameClear=detailState?.kind==='clear'&&detail.kind==='clear'&&detailPanel.open;
+    detailState=detail;
+    if(detail.kind==='clear') {
+      $('#detail-title').textContent='CLEAR em um prompt de liderança';
+      if(!sameClear)$('#detail-body').innerHTML=`<p class="muted">Selecione uma letra para destacar como o princípio aparece no exemplo. Adaptar e refletir continuam na conversa e na revisão humana.</p><div class="clear-selectors" role="group" aria-label="Princípios CLEAR">${slide.cards.map(card=>`<button class="clear-selector" data-action="clear-letter" data-id="${card.letter}" aria-pressed="false" aria-controls="clear-prompt"><b>${card.letter}</b><span>${esc(card.title.slice(4))}</span></button>`).join('')}</div><div id="clear-explanation" class="notice" aria-live="polite"></div><div id="clear-prompt" class="clear-prompt" tabindex="0" aria-label="Exemplo completo de prompt CLEAR">${slide.clearExample.map(part=>`<p class="clear-segment" data-letter="${part.letter}"><span class="clear-segment-label">${esc(slide.cards.find(card=>card.letter===part.letter).title)}</span>${esc(part.text)}</p>`).join('')}</div><div class="actions"><button class="primary" data-action="copy-clear">Copiar prompt completo</button></div><p class="source-note">Princípios de <a href="${esc(slide.source.url)}" target="_blank" rel="noopener noreferrer">${esc(slide.source.title)}</a>. Exemplo didático adaptado à Núcleo Casa.</p>`;
+      const card=slide.cards.find(card=>card.letter===detail.letter);
+      $('#clear-explanation').textContent=`${card.title} · ${card.detail.explanation}`;
+      for(const button of detailPanel.querySelectorAll('[data-action="clear-letter"]'))button.setAttribute('aria-pressed',String(button.dataset.id===detail.letter));
+      for(const part of detailPanel.querySelectorAll('.clear-segment'))part.classList.toggle('highlighted',part.dataset.letter===detail.letter);
+    } else {
+      const card=slide.cards[detail.card];if(!card)return;
+      $('#detail-title').textContent=card.title;
+      $('#detail-body').innerHTML=`<p class="detail-intro">${esc(card.detail.explanation)}</p><section class="detail-example"><span class="eyebrow">EXEMPLO NO WORKSHOP</span><p>${esc(card.detail.example)}</p></section><section class="detail-question"><span class="eyebrow">PARA DISCUTIR</span><p>${esc(card.detail.question)}</p></section>`;
+    }
+    if(!detailPanel.open)detailPanel.showModal();
+    if(detail.kind==='clear') {const highlighted=$('.clear-segment.highlighted',detailPanel);if(highlighted)$('#clear-prompt').scrollTop=Math.max(0,highlighted.offsetTop-12);}
+    if(!sameClear)$('#detail-body').scrollTop=0;
+  }
+  function hideDetail() {detailState=null;if(detailPanel.open)detailPanel.close();}
+  async function presentDetail(detail) {
+    if(S.room&&S.role==='presenter')await updateRoom({presentation:detail});
+    else {exploreLocally();if(detail)showDetail(detail);else hideDetail();}
+  }
+  function syncPresentation(room,{force=false}={}) {
+    const key=JSON.stringify(room.presentation||null);
+    if((S.role==='presenter'||S.follow)&&(force||lastPresentation!==key)) {
+      if(room.presentation)showDetail(room.presentation);else hideDetail();
+    }
+    lastPresentation=key;
+  }
+  detailPanel.addEventListener('cancel',event=>{event.preventDefault();presentDetail(null).catch(error=>toast(error.message));});
+  function activeTimer() {return S.room?S.room.activity_timer:localTimer;}
+  function secondsLeft(timer,now=Date.now()/1000+(S.room?clockOffset:0)) {
+    if(!timer)return 0;
+    return Math.max(0,Math.ceil(timer.status==='running'?timer.ends_at-now:timer.remaining));
+  }
+  function formatTime(seconds) {return `${String(Math.floor(seconds/60)).padStart(2,'0')}:${String(seconds%60).padStart(2,'0')}`;}
+  async function enableAlarm() {
+    try {
+      const Audio=window.AudioContext||window.webkitAudioContext;
+      if(!Audio)return false;
+      audioContext??=new Audio();
+      if(audioContext.state!=='running')await audioContext.resume();
+      return audioContext.state==='running';
+    } catch {return false;}
+  }
+  function playAlarm() {
+    if(audioContext?.state!=='running')return;
+    const now=audioContext.currentTime;
+    for(let i=0;i<6;i++) {
+      const oscillator=audioContext.createOscillator(),gain=audioContext.createGain(),start=now+i*.45;
+      oscillator.frequency.value=i%2?660:880;
+      gain.gain.setValueAtTime(0,start);gain.gain.linearRampToValueAtTime(.14,start+.02);gain.gain.setValueAtTime(.14,start+.2);gain.gain.linearRampToValueAtTime(0,start+.3);
+      oscillator.connect(gain);gain.connect(audioContext.destination);oscillator.start(start);oscillator.stop(start+.32);
+      oscillator.onended=()=>{oscillator.disconnect();gain.disconnect();};
+    }
+  }
+  function timerControls(timer) {
+    const editable=!S.room||S.role==='presenter',seconds=secondsLeft(timer);
+    return `${editable?`${seconds>0?`<button class="secondary small" data-action="timer-${timer.status==='running'?'pause':'resume'}">${timer.status==='running'?'Pausar':'Retomar'}</button>`:''}<button class="text-button" data-action="timer-reset">Zerar contador</button>`:'<span class="muted">Tempo da turma</span>'}${audioContext?.state!=='running'?'<button class="secondary small" data-action="enable-alarm">Ativar som</button>':'<span class="sound-ready">Som ativado</span>'}`;
+  }
+  function updateCountdown() {
+    const timer=activeTimer(),banner=$('#live-timer');
+    if(!timer){banner.hidden=true;timerMarkup='';clearInterval(countdownInterval);countdownInterval=null;return;}
+    const seconds=secondsLeft(timer),exercise=exerciseById(timer.exercise);
+    const controls=timerControls(timer),key=`${timer.id}:${timer.status}:${seconds===0}:${controls}`;
+    if(key!==timerMarkup) {
+      banner.innerHTML=`<div><b>${esc(exercise.title)}</b><span class="timer-label">${seconds===0?'Tempo encerrado':timer.status==='paused'?'Contador pausado':'Atividade em andamento'}</span></div><output class="timer-digits" role="timer" aria-label="Tempo restante">${formatTime(seconds)}</output><div class="timer-actions">${controls}</div>`;
+      timerMarkup=key;
+    }
+    banner.hidden=false;banner.classList.toggle('finished',seconds===0);
+    const display=$('.timer-digits',banner);display.textContent=formatTime(seconds);
+    const slot=$('[data-timer-slot]');
+    if(slot&&C.slides[S.index].exercise===timer.exercise)slot.textContent=seconds===0?'Tempo encerrado':`${formatTime(seconds)} · ${timer.status==='paused'?'pausado':'em andamento'}`;
+    const start=$('[data-action="timer-start"]');
+    if(start&&start.dataset.id===timer.exercise) {
+      start.disabled=seconds>0;
+      start.textContent=`${seconds===0?'Reiniciar':'Iniciar'} contador · ${exercise.minutes} min`;
+    }
+    if(seconds===0&&!alarmedTimers.has(timer.id)) {
+      alarmedTimers.add(timer.id);playAlarm();toast(`Tempo encerrado: ${exercise.title}.`);
+    }
+  }
+  function syncTimer() {
+    updateCountdown();
+    if(activeTimer()&&!countdownInterval)countdownInterval=setInterval(updateCountdown,250);
+  }
+  async function controlTimer(action,exerciseId) {
+    if(S.room&&S.role!=='presenter')return;
+    if(action==='start'||action==='resume') {
+      if(!await enableAlarm())toast('Contador ativo com aviso visual. Use “Ativar som” para habilitar o alarme neste navegador.');
+    }
+    if(S.room)await updateRoom({timer_action:action,...(exerciseId?{exercise:exerciseId}:{})});
+    else {
+      const now=Date.now()/1000;
+      if(action==='start') {const duration=exerciseById(exerciseId).minutes*60;localTimer={id:uid(),exercise:exerciseId,duration,remaining:duration,ends_at:now+duration,status:'running'};}
+      else if(action==='reset')localTimer=null;
+      else if(action==='pause'&&localTimer?.status==='running')localTimer={...localTimer,remaining:Math.max(0,localTimer.ends_at-now),ends_at:null,status:'paused'};
+      else if(action==='resume'&&localTimer?.status==='paused'&&localTimer.remaining>0)localTimer={...localTimer,ends_at:now+localTimer.remaining,status:'running'};
+    }
+    render();syncTimer();
+  }
   function qrCard() {
-    if(S.room) return `<aside class="join-card"><span class="eyebrow">ACOMPANHE NO SEU DISPOSITIVO</span><h3>Entre na sala.</h3><div class="qr-frame"><img src="/api/rooms/${encodeURIComponent(S.room.code)}/qr.png" alt="QR code para entrar nesta sala" width="194" height="194"></div><div class="room-code">${esc(S.room.code)}</div><p>Escaneie a câmera do celular.<br>Sem instalar aplicativo.</p><button class="primary lime" data-action="copy-room">Copiar link de acesso ↗</button>${S.room.local_url?'<p class="local-warning">Endereço local. Configure PUBLIC_BASE_URL com o endereço acessível no celular antes da aula.</p>':''}</aside>`;
-    return `<aside class="join-card"><span class="eyebrow">UMA EXPERIÊNCIA COMPARTILHADA</span><h3>Aprenda junto.<br>Compare na prática.</h3><div class="qr-frame"><div class="qr-empty"><span class="qr-symbol">▦</span><span>O QR code desta turma aparece ao criar uma sala.</span></div></div><button class="primary lime" data-action="room">${S.backend?'Criar ou entrar na sala':'Ver como ativar a sala'}</button><p>${S.backend?'Apresentador controla os slides.<br>Você constrói seu repertório.':'Prévia de estudo. Sincronização e envios precisam do servidor.'}</p></aside>`;
+    if(S.room) return `<aside class="join-card"><span class="eyebrow">ACOMPANHE AO VIVO</span><h3>Entre na sala.</h3><div class="qr-frame"><img src="/api/rooms/${encodeURIComponent(S.room.code)}/qr.png" alt="QR code para entrar nesta sala" width="194" height="194"></div><div class="room-code">${esc(S.room.code)}</div><p>Escaneie a câmera do celular.<br>Sem instalar aplicativo.</p><button class="primary lime" data-action="copy-room">Copiar link ↗</button>${S.room.local_url?'<p class="local-warning">Endereço local. Configure o acesso da turma antes da aula.</p>':''}</aside>`;
+    return `<aside class="join-card"><span class="eyebrow">APRENDA EM CONJUNTO</span><h3>Participe da sala.</h3><div class="qr-frame"><div class="qr-empty"><span class="qr-symbol">▦</span><span>Crie a sala para exibir o QR code.</span></div></div><button class="primary lime" data-action="room">${S.backend?'Criar ou entrar na sala':'Ver como ativar a sala'}</button><p>${S.backend?'Apresentador controla os slides.<br>Você constrói seu repertório.':'Prévia de estudo. Sincronização e envios precisam do servidor.'}</p></aside>`;
   }
   function render() {
     const slide=C.slides[S.index];
-    const cards=slide.cards.map(c=>`<article class="info-card"><h3>${esc(c.title)}</h3><p>${esc(c.body)}</p></article>`).join('');
-    const promptBox=slide.prompts.length?`<section class="prompt-box" aria-label="Exemplos de prompts"><div class="box-heading"><span>REFERÊNCIAS PARA EXPLORAR</span><button class="text-button" data-action="library">Ver todos os 33 ↗</button></div><div class="prompt-choices">${slide.prompts.map(id=>{const p=promptById(id);return `<button class="prompt-choice" data-action="prompt" data-id="${id}"><span class="prompt-id">${id}</span><span>${esc(p.title)}</span></button>`;}).join('')}</div></section>`:'';
+    const cards=slide.cards.map((c,index)=>`<button class="info-card" data-action="${slide.kind==='clear'?'clear-open':'card-detail'}" data-index="${index}" data-id="${c.letter||''}" aria-haspopup="dialog"><span class="card-title">${esc(c.title)}</span>${c.english?`<span class="card-english">${esc(c.english)}</span>`:''}<span class="card-summary">${esc(c.body)}</span><span class="card-hint">${slide.kind==='clear'?'Ver no prompt':'Explorar o conceito'} ↗</span></button>`).join('');
+    const promptBox=slide.prompts.length?`<section class="prompt-box" aria-label="Exemplos de prompts"><div class="box-heading"><span>PROMPTS PARA EXPLORAR</span><button class="text-button" data-action="library">Ver todos os 33 ↗</button></div><div class="prompt-choices">${slide.prompts.map(id=>{const p=promptById(id);return `<button class="prompt-choice" data-action="prompt" data-id="${id}"><span class="prompt-id">${id}</span><span>${esc(p.title)}</span></button>`;}).join('')}</div></section>`:'';
     const datasetLinks=slide.id==='caso'?'<div class="actions"><a class="primary" href="resources/dados/nucleo-casa-exercicios.xlsx" download>Baixar planilha de exercícios</a><button class="secondary" data-action="downloads">Ver todos os materiais</button></div>':'';
     const e=exerciseById(slide.exercise);
-    const exercise=e?`<div class="exercise-callout"><div><b>Na prática · ${esc(e.title)}</b><p>${e.minutes} minutos · ${esc(e.deliverable)}</p></div><button class="primary" data-action="activity" data-id="${e.id}">Registrar minha tentativa ↗</button></div>`:'';
+    const exercise=e?`<div class="exercise-callout"><div><b>Na prática · ${esc(e.title)}</b><p>${e.minutes} minutos · ${esc(e.deliverable)}</p><span class="exercise-time" data-timer-slot>${activeTimer()?.exercise===e.id?formatTime(secondsLeft(activeTimer())):S.room&&S.role==='student'?'O facilitador inicia o tempo da turma.':'Pronto para começar?'}</span></div><div class="exercise-actions">${!S.room||S.role==='presenter'?`<button class="secondary" data-action="timer-start" data-id="${e.id}" ${activeTimer()?.exercise===e.id&&secondsLeft(activeTimer())>0?'disabled':''}>${activeTimer()?.exercise===e.id&&secondsLeft(activeTimer())===0?'Reiniciar':'Iniciar'} contador · ${e.minutes} min</button>`:''}<button class="primary" data-action="activity" data-id="${e.id}">Registrar minha tentativa ↗</button></div></div>`:'';
+    const clearAction=slide.kind==='clear'?`<div class="clear-footer"><button class="primary" data-action="clear-open" data-id="C">Explorar um prompt com CLEAR ↗</button><p class="source-note">${esc(slide.source.title)} · Selecione uma letra para ver sua aplicação.</p></div>`:'';
     let html;
-    if(slide.kind==='welcome') html=`<section class="stage-slide" data-slide="${slide.id}"><div class="welcome-layout"><div><span class="hero-label">WORKSHOP · IA + DADOS + DECISÃO</span><h1><span class="hero-line">Do dado</span><span class="hero-line">à <span class="highlight">decisão.</span></span></h1><p class="lead">Prompts para Lideranças.<br>Contexto que orienta. Evidência que sustenta.<br>Decisões que devolvem tempo.</p><div class="hero-actions"><button class="primary" data-action="next">Começar a experiência →</button><button class="secondary" data-action="library">Explorar os prompts</button></div><span class="hero-meta">2H30 · 5 PERSPECTIVAS C-LEVEL · 7 EXERCÍCIOS</span></div>${qrCard()}</div><div class="card-grid welcome-cards">${cards}</div></section>`;
-    else html=`<section class="stage-slide" data-slide="${slide.id}"><span class="eyebrow">${String(S.index+1).padStart(2,'0')} / ${esc(slide.chapter)} · KEYCORE ACADEMY</span><h2>${esc(slide.title)}</h2><p class="lead">${esc(slide.lead)}</p><div class="card-grid">${cards}</div>${datasetLinks}${promptBox}${exercise}${slide.kind==='compare'?'<div class="actions"><button class="primary" data-action="gallery">Abrir resultados autorizados ↗</button><button class="secondary" data-action="mine">Minhas tentativas</button></div>':''}${slide.kind==='downloads'||slide.kind==='closing'?'<div class="actions"><button class="primary" data-action="downloads">Baixar material de estudo ↗</button><button class="secondary" data-action="export-mine">Exportar minhas tentativas</button></div>':''}</section>`;
+    if(slide.kind==='welcome') html=`<section class="stage-slide" data-slide="${slide.id}"><div class="welcome-layout"><div><span class="hero-label">WORKSHOP · IA + DADOS + DECISÃO</span><h1><span class="hero-line">Do dado</span><span class="hero-line">à <span class="highlight">decisão.</span></span></h1><p class="lead">Prompts para Lideranças.<br>Contexto, evidência e ação na sua rotina.</p><div class="hero-actions"><button class="primary" data-action="next">Começar a experiência →</button><button class="secondary" data-action="library">Explorar os prompts</button></div><span class="hero-meta">2H30 · 5 CADEIRAS · 7 EXERCÍCIOS</span></div>${qrCard()}</div><div class="card-grid welcome-cards">${cards}</div></section>`;
+    else html=`<section class="stage-slide" data-slide="${slide.id}"><span class="eyebrow">${String(S.index+1).padStart(2,'0')} / ${esc(slide.chapter)} · KEYCORE ACADEMY</span><h2>${esc(slide.title)}</h2><p class="lead">${esc(slide.lead)}</p><div class="card-grid${slide.cards.length===5?' five-cards':''}${slide.kind==='clear'?' clear-grid':''}">${cards}</div>${clearAction}${datasetLinks}${promptBox}${exercise}${slide.kind==='compare'?'<div class="actions"><button class="primary" data-action="gallery">Abrir resultados autorizados ↗</button><button class="secondary" data-action="mine">Minhas tentativas</button></div>':''}${slide.kind==='downloads'||slide.kind==='closing'?'<div class="actions"><button class="primary" data-action="downloads">Baixar material de estudo ↗</button><button class="secondary" data-action="export-mine">Exportar minhas tentativas</button></div>':''}</section>`;
     $('#stage').innerHTML=html;$('#counter').textContent=`${String(S.index+1).padStart(2,'0')} / ${C.slides.length}`;$('#chapter').textContent=slide.chapter;
     $('#progress').style.width=`${(S.index+1)/C.slides.length*100}%`;
     $('[data-action=prev]').disabled=S.index===0;$('[data-action=next]', $('.slide-nav')).disabled=S.index===C.slides.length-1;
-    syncHeader();
+    syncHeader();syncTimer();
   }
   async function navigate(index,{remote=false}={}) {
     const next=Math.max(0,Math.min(C.slides.length-1,index));
     if(!remote&&S.room&&S.role==='presenter') {
       if(S.busy)return;S.busy=true;
-      try {
-        for(let attempt=0;attempt<2;attempt++) {
-          try{S.room=await api(`/api/rooms/${S.room.code}`,{method:'PATCH',body:{slide:C.slides[next].id,version:S.room.version}});break;}
-          catch(err){if(err.status!==409||attempt)throw err;S.room=await api(`/api/rooms/${S.room.code}`);}
-        }
-      }finally{S.busy=false;}
-    } else if(!remote&&S.room&&S.role==='student'){S.follow=false;}
+      try {await updateRoom({slide:C.slides[next].id,presentation:null});}finally{S.busy=false;}
+    } else if(!remote){exploreLocally();hideDetail();}
     S.index=next;render();window.scrollTo({top:0,behavior:'instant'});
   }
   function receiveState(room) {
-    const prior=S.room;S.room=room;syncHeader();
+    const prior=S.room;
+    if(prior?.code===room.code&&(room.version<prior.version||(room.version===prior.version&&room.revision<prior.revision)))return;
+    S.room=room;syncHeader();
+    if(Number.isFinite(room.server_time))clockOffset=room.server_time-Date.now()/1000;
     const remoteIndex=C.slides.findIndex(s=>s.id===room.slide);
     if(remoteIndex>=0&&(S.role==='presenter'||S.follow)&&S.index!==remoteIndex){S.index=remoteIndex;render();}
-    else if(S.index===0&&prior?.code!==room.code)render();
+    else if((S.index===0&&prior?.code!==room.code)||JSON.stringify(prior?.activity_timer)!==JSON.stringify(room.activity_timer))render();
+    syncPresentation(room);syncTimer();
     if(S.panel==='gallery'&&galleryRevision!==room.revision){galleryPending=true;refreshGalleryWhenReady();}
   }
   function galleryIsEditing() {
@@ -93,7 +225,7 @@
     status('Conectando à sala…');
     const roomCode=S.room.code;
     S.source=new EventSource(`/api/rooms/${roomCode}/events`);
-    S.source.addEventListener('state',event=>{try{receiveState(JSON.parse(event.data));status('Conectado ao vivo','connected');clearInterval(S.poll);S.poll=null;}catch{toast('Atualização inválida. Recarregue a sala.');}});
+    S.source.addEventListener('state',event=>{if(S.room?.code!==roomCode)return;try{receiveState(JSON.parse(event.data));status('Conectado ao vivo','connected');clearInterval(S.poll);S.poll=null;}catch{toast('Atualização inválida. Recarregue a sala.');}});
     S.source.addEventListener('ended',()=>{S.source.close();clearInterval(S.poll);S.poll=null;status('Sala ou sessão indisponível','warning');toast('A sala foi excluída ou sua sessão expirou. Seus rascunhos permanecem nesta aba.');});
     S.source.onopen=()=>{status('Conectado ao vivo','connected');clearInterval(S.poll);S.poll=null;};
     S.source.onerror=()=>{
@@ -101,7 +233,7 @@
       if(!S.poll)S.poll=setInterval(async()=>{try{receiveState(await api(`/api/rooms/${roomCode}`));}catch(err){if([401,403,404,409].includes(err.status)){clearInterval(S.poll);S.poll=null;S.source.close();status('Entre novamente na sala','warning');}}},5000);
     };
   }
-  function useRoom(room) {S.room=room;store('kc-current-room',room.code);S.follow=true;S.index=Math.max(0,C.slides.findIndex(s=>s.id===room.slide));history.replaceState(null,'',`?sala=${encodeURIComponent(room.code)}`);render();connect();}
+  function useRoom(room) {hideDetail();lastPresentation=undefined;localTimer=null;S.room=room;clockOffset=Number.isFinite(room.server_time)?room.server_time-Date.now()/1000:0;store('kc-current-room',room.code);S.follow=true;S.index=Math.max(0,C.slides.findIndex(s=>s.id===room.slide));history.replaceState(null,'',`?sala=${encodeURIComponent(room.code)}`);render();syncPresentation(room,{force:true});syncTimer();connect();}
   async function refreshMe() {const me=await api('/api/me');S.role=me.role;S.rooms=me.rooms;S.retention=me.retention_days;return me;}
   async function roomPanel() {
     if(!S.backend) {openPanel('room','Da prévia para uma turma ao vivo',`<div class="notice warning">Este arquivo funciona como material de estudo. Não há servidor conectado, então não há sincronização entre dispositivos nem envio para a turma.</div><p>O projeto inclui o servidor, o banco de dados e o gerador de QR code. Para iniciar, execute na pasta do projeto:</p><pre class="code-box">python3 -m venv .venv\nsource .venv/bin/activate\npip install -r requirements.txt\npython scripts/start_local.py</pre><p class="muted">No Windows: <code>.venv\\Scripts\\activate</code>. Para usar no celular, configure o endereço acessível em <code>PUBLIC_BASE_URL</code>. A implantação e as permissões do GitHub não são feitas por esta prévia.</p>`);return;}
@@ -204,6 +336,15 @@
     try {
       switch(action){
         case 'close':closePanel();break;
+        case 'close-detail':await presentDetail(null);break;
+        case 'card-detail':await presentDetail({kind:'card',slide:C.slides[S.index].id,card:Number(button.dataset.index)});break;
+        case 'clear-open':case 'clear-letter':await presentDetail({kind:'clear',slide:'clear',letter:id||'C'});break;
+        case 'copy-clear':await copy(C.slides.find(slide=>slide.id==='clear').clearExample.map(part=>part.text).join('\n\n'));break;
+        case 'timer-start':await controlTimer('start',id);break;
+        case 'timer-pause':await controlTimer('pause');break;
+        case 'timer-resume':await controlTimer('resume');break;
+        case 'timer-reset':await controlTimer('reset');break;
+        case 'enable-alarm':toast(await enableAlarm()?'Som ativado neste dispositivo.':'Não foi possível ativar o som neste navegador.');updateCountdown();break;
         case 'next':await navigate(S.index+1);break;
         case 'prev':await navigate(S.index-1);break;
         case 'goto':closePanel();await navigate(Number(button.dataset.index));break;
@@ -235,10 +376,10 @@
         case 'delete-submission':if(confirm('Excluir esta tentativa e seus anexos? Esta ação não pode ser desfeita.')){await api(`/api/submissions/${id}`,{method:'DELETE'});S.selected.delete(id);await loadGallery();}break;
         case 'export-mine':await exportMine();break;
         case 'notes':notes();break;
-        case 'follow':S.follow=!S.follow;if(S.follow){S.room=await api(`/api/rooms/${S.room.code}`);receiveState(S.room);}syncHeader();break;
-        case 'toggle-room':S.room=await api(`/api/rooms/${S.room.code}`,{method:'PATCH',body:{closed:!S.room.closed,version:S.room.version}});syncHeader();await roomPanel();break;
-        case 'delete-room':if(confirm('Excluir definitivamente esta sala, todas as tentativas e todos os anexos? Exporte antes os registros necessários.')){await api(`/api/rooms/${S.room.code}`,{method:'DELETE'});S.source?.close();clearInterval(S.poll);S.room=null;S.index=0;history.replaceState(null,'',location.pathname);status('Modo de estudo');render();await roomPanel();}break;
-        case 'logout':await api('/api/logout',{method:'POST'});S.source?.close();clearInterval(S.poll);S.room=null;S.role='guest';S.index=0;status('Modo de estudo');render();closePanel();break;
+        case 'follow':S.follow=!S.follow;if(S.follow){const room=await api(`/api/rooms/${S.room.code}`);receiveState(room);syncPresentation(S.room,{force:true});}syncHeader();break;
+        case 'toggle-room':await updateRoom({closed:!S.room.closed});await roomPanel();break;
+        case 'delete-room':if(confirm('Excluir definitivamente esta sala, todas as tentativas e todos os anexos? Exporte antes os registros necessários.')){await api(`/api/rooms/${S.room.code}`,{method:'DELETE'});S.source?.close();clearInterval(S.poll);S.room=null;localTimer=null;hideDetail();lastPresentation=undefined;S.index=0;history.replaceState(null,'',location.pathname);status('Modo de estudo');render();await roomPanel();}break;
+        case 'logout':await api('/api/logout',{method:'POST'});S.source?.close();clearInterval(S.poll);S.room=null;localTimer=null;hideDetail();lastPresentation=undefined;S.role='guest';S.index=0;status('Modo de estudo');render();closePanel();break;
         case 'fullscreen':if(!document.fullscreenElement)await document.documentElement.requestFullscreen();else await document.exitFullscreen();break;
       }
     } catch(error){toast(error.message);}
@@ -272,7 +413,7 @@
     }catch(error){toast(error.message);}
   });
   document.addEventListener('keydown',event=>{
-    if(panel.open||event.target.closest('input,textarea,select,[contenteditable=true]'))return;
+    if(panel.open||detailPanel.open||event.target.closest('button,a,input,textarea,select,[contenteditable=true]'))return;
     if(['ArrowRight','ArrowLeft',' '].includes(event.key)){event.preventDefault();navigate(S.index+(event.key==='ArrowLeft'?-1:1)).catch(error=>toast(error.message));}
     if(event.key.toLowerCase()==='f')$('[data-action=fullscreen]').click();
   });

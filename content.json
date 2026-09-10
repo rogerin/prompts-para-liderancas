@@ -13,15 +13,30 @@
       "cards": [
         {
           "title": "01 · Contexto",
-          "body": "Entenda o negócio antes de pedir respostas."
+          "body": "Apresente o negócio, a decisão e os limites para orientar a IA desde a primeira pergunta.",
+          "detail": {
+            "explanation": "Contexto é o enquadramento da decisão: quem vai usar a resposta, qual problema precisa resolver, em que período e com quais restrições. Sem isso, a IA preenche lacunas com suposições que podem não servir ao negócio.",
+            "example": "Você apoia a liderança da Núcleo Casa. Avalie o crescimento até novembro/2025 para preparar uma decisão sobre Q1/2026, usando apenas a base fictícia anexada.",
+            "question": "Que informação sobre o seu negócio a IA precisaria conhecer antes de sugerir uma ação?"
+          }
         },
         {
           "title": "02 · Evidência",
-          "body": "Transforme dados em recomendações verificáveis."
+          "body": "Peça fontes e cálculos para conferir os achados antes de confiar na recomendação.",
+          "detail": {
+            "explanation": "Uma afirmação fica mais útil quando outra pessoa consegue verificar de onde ela veio. Peça arquivo, período, linhas utilizadas e fórmula. Separe o que foi calculado daquilo que ainda é hipótese; citar uma fonte não garante que ela sustente a conclusão.",
+            "example": "Em vez de “a margem piorou”, peça a comparação entre períodos, a definição de margem utilizada e as linhas que permitem refazer o cálculo.",
+            "question": "Qual número você conferiria primeiro antes de levar essa resposta para uma reunião?"
+          }
         },
         {
           "title": "03 · Decisão",
-          "body": "Compare alternativas e registre o próximo passo."
+          "body": "Compare alternativas e defina o próximo passo, com responsável, indicador e data de revisão.",
+          "detail": {
+            "explanation": "Decidir exige transformar a análise em uma escolha que possa ser acompanhada. Explicite as alternativas, a renúncia envolvida e as condições que fariam o grupo rever a decisão. A liderança continua responsável por aprovar e acompanhar a ação.",
+            "example": "Proponha um piloto de logística com responsável por função, limite de orçamento, indicador de atraso e revisão em 30 dias. Identifique as metas como propostas.",
+            "question": "O que faria você interromper ou mudar essa decisão?"
+          }
         }
       ],
       "prompts": [],
@@ -37,15 +52,30 @@
       "cards": [
         {
           "title": "Você leva",
-          "body": "33 prompts editáveis, dados fictícios, rubrica e seus próprios registros."
+          "body": "Leve 33 prompts editáveis, dados fictícios e uma rubrica para adaptar o aprendizado à sua rotina de liderança.",
+          "detail": {
+            "explanation": "O material é um ponto de partida para experimentar. Escolha o prompt pela decisão que precisa apoiar, substitua os campos e confira se as fontes solicitadas estão disponíveis. Guarde suas versões para entender o que melhorou.",
+            "example": "Use o canvas para adaptar um prompt de análise à sua área e a rubrica para comparar a primeira resposta com a versão revisada.",
+            "question": "Qual tarefa recorrente você gostaria de levar como próximo experimento?"
+          }
         },
         {
           "title": "Acordo de aula",
-          "body": "Nenhum dado real de cliente, paciente ou funcionário. Use apenas o caso fictício."
+          "body": "Trabalhe somente com o caso fictício e compartilhe resultados com consentimento, sem expor informações de pessoas ou empresas.",
+          "detail": {
+            "explanation": "A turma usa a mesma base sintética para poder comparar resultados. Nomes de clientes, informações de funcionários e documentos internos não são necessários. O participante autoriza o compartilhamento e o facilitador revisa antes da exibição.",
+            "example": "Se quiser discutir um problema da sua rotina, descreva a situação de forma genérica e mantenha os dados do exercício fictício.",
+            "question": "Há alguma informação no seu envio que não precisa estar aqui?"
+          }
         },
         {
           "title": "Como participar",
-          "body": "Copie o prompt para sua IA. Volte e cole o resultado ou anexe um arquivo."
+          "body": "Execute o prompt na IA de sua escolha e registre aqui o modelo, a resposta e o que você conferiu.",
+          "detail": {
+            "explanation": "A plataforma organiza a aula e os registros; a execução acontece na ferramenta de IA escolhida pela pessoa ou dupla. Anexe as fontes nessa ferramenta, guarde a resposta e volte à atividade para registrar o percurso.",
+            "example": "Baixe vendas e dicionário, anexe à sua IA, execute o prompt e cole o resultado em “Registrar minha tentativa”.",
+            "question": "Outra dupla conseguiria entender quais arquivos e modelo você usou?"
+          }
         }
       ],
       "prompts": [],
@@ -57,19 +87,34 @@
       "id": "caso",
       "chapter": "Dados",
       "title": "Conheça a Núcleo Casa.",
-      "lead": "Varejo omnicanal fictício, com e-commerce, 12 lojas e B2B. Base NC-2026.1, de janeiro/2023 a dezembro/2025.",
+      "lead": "Varejo fictício: e-commerce, 12 lojas e B2B. Base NC-2026.1 · janeiro/2023 a dezembro/2025.",
       "cards": [
         {
           "title": "R$ 48,6 milhões",
-          "body": "Receita BRUTA acumulada, reconciliada no CSV."
+          "body": "Receita bruta acumulada entre 2023 e 2025, conferida no CSV; esse total não representa lucro nem caixa disponível.",
+          "detail": {
+            "explanation": "Receita bruta é uma medida de vendas antes das deduções definidas no dicionário. O total de R$ 48,6 milhões cobre todo o período da base. Para discutir qualidade do crescimento, compare também custos e margens no mesmo recorte.",
+            "example": "Some a coluna de receita bruta de todas as linhas de vendas e confronte com o resumo. Depois compare os anos separadamente.",
+            "question": "Vender mais significa necessariamente gerar mais valor?"
+          }
         },
         {
           "title": "41.820 pedidos",
-          "body": "Pedidos não são clientes únicos. A base não permite calcular recompra."
+          "body": "Volume acumulado de pedidos nos três anos. Sem identificar clientes únicos, não é possível medir recompra ou retenção.",
+          "detail": {
+            "explanation": "Um mesmo cliente pode realizar vários pedidos. Como a base não identifica clientes individuais nem coortes, não é possível deduzir quantos voltaram a comprar ou por quanto tempo permaneceram ativos.",
+            "example": "É possível calcular receita bruta por pedido usando os totais. Não é possível transformar esse indicador em receita por cliente único.",
+            "question": "Qual dado adicional seria necessário para medir recompra?"
+          }
         },
         {
           "title": "432 registros",
-          "body": "Mês × canal × região. Pessoas e estoque estão em bases mensais agregadas."
+          "body": "Vendas organizadas por mês, canal e região; pessoas e estoque usam tabelas próprias, consolidadas por mês.",
+          "detail": {
+            "explanation": "São 36 meses × 3 canais × 4 regiões. Cada linha representa um agregado, não uma venda individual. Pessoas e estoque têm uma linha por mês; consolide vendas nesse nível antes de cruzar as bases.",
+            "example": "Se repetir a folha mensal nas 12 combinações de canal e região, você multiplica o custo de pessoal indevidamente.",
+            "question": "O que uma linha representa em cada arquivo que você anexou?"
+          }
         }
       ],
       "prompts": [],
@@ -80,20 +125,35 @@
     {
       "id": "primeira-tentativa",
       "chapter": "Prática",
-      "title": "Antes de aprender a técnica, registre seu ponto de partida.",
-      "lead": "Peça à IA para avaliar a qualidade do crescimento. Guarde exatamente o que você escreveu e recebeu.",
+      "title": "Registre seu ponto de partida.",
+      "lead": "Avalie o crescimento da Núcleo Casa e guarde seu prompt, o modelo usado e a resposta.",
       "cards": [
         {
           "title": "Mesma pergunta",
-          "body": "O crescimento da Núcleo Casa é saudável?"
+          "body": "Investigue se o crescimento da Núcleo Casa é saudável e guarde sua pergunta original para comparar depois.",
+          "detail": {
+            "explanation": "O primeiro registro mostra como você formularia o pedido antes das técnicas do workshop. Não tente acertar o formato ideal agora. Precisamos preservar o ponto de partida para observar melhorias concretas na revisão.",
+            "example": "Escreva com suas palavras um pedido para avaliar a qualidade do crescimento, sem copiar a biblioteca nesta primeira rodada.",
+            "question": "O que você espera receber quando pede uma análise de crescimento?"
+          }
         },
         {
           "title": "Mesma base",
-          "body": "Anexe vendas e dicionário. Registre modelo e configurações relevantes."
+          "body": "Anexe vendas e dicionário; registre o modelo e as configurações para tornar a comparação posterior mais consistente.",
+          "detail": {
+            "explanation": "Respostas mudam com o prompt, os arquivos disponíveis e a ferramenta utilizada. Registrar essas condições ajuda a não atribuir toda diferença ao texto do pedido. A IA precisa confirmar quais anexos conseguiu acessar.",
+            "example": "Registre o nome exibido do modelo, os arquivos anexados e se havia navegação ou execução de cálculos habilitada.",
+            "question": "A resposta usou os dados anexados ou apenas comentou o problema de forma genérica?"
+          }
         },
         {
           "title": "Sem julgamento",
-          "body": "O erro é matéria-prima para a revisão."
+          "body": "Registre também dúvidas e falhas: elas mostram quais instruções precisam melhorar na próxima tentativa.",
+          "detail": {
+            "explanation": "Esta rodada é uma referência de aprendizagem, sem ranking. Uma resposta vaga, um número sem fonte ou uma lacuna ignorada oferecem pistas para reescrever o prompt. Preserve o resultado original antes de editar.",
+            "example": "Anote na reflexão: “A resposta recomendou expansão, mas não mostrou a margem nem explicou o limite dos dados”.",
+            "question": "Qual falha da resposta você quer corrigir primeiro?"
+          }
         }
       ],
       "prompts": [],
@@ -102,22 +162,130 @@
       "notes": "Dê 3 minutos. Não mostre os exemplos ainda. Peça consentimento, não obrigue a publicação."
     },
     {
+      "id": "clear",
+      "chapter": "Prompts",
+      "title": "Crie prompts mais claros com CLEAR.",
+      "lead": "Cinco princípios para escrever, testar e melhorar. Selecione uma letra para explorar sua aplicação.",
+      "kind": "clear",
+      "prompts": [],
+      "exercise": null,
+      "notes": "Apresente Conciso, Lógico, Explícito, Adaptável e Reflexivo. Abra o exemplo e selecione cada letra. A e R orientam também a conversa e a revisão humana; não são apenas blocos de texto. Retome a tentativa inicial para discutir uma melhoria sem antecipar sua reescrita completa.",
+      "cards": [
+        {
+          "title": "C · Conciso",
+          "letter": "C",
+          "english": "Concise",
+          "body": "Faça um pedido direto, com foco na decisão e no contexto necessário.",
+          "detail": {
+            "explanation": "Concisão preserva o que importa e elimina pedidos vagos ou redundantes. Ser breve não significa omitir fonte, objetivo ou limite.",
+            "example": "Avalie se a Núcleo Casa cresceu com qualidade entre janeiro/2023 e novembro/2025 para orientar as prioridades de Q1/2026.",
+            "question": "Como esse princípio melhoraria sua tentativa inicial?"
+          }
+        },
+        {
+          "title": "L · Lógico",
+          "letter": "L",
+          "english": "Logical",
+          "body": "Organize as etapas: confira as fontes, analise os dados e recomende.",
+          "detail": {
+            "explanation": "A ordem do trabalho deve ajudar a conferir o resultado. Primeiro reconheça a base, depois compare indicadores e só então proponha uma ação.",
+            "example": "Primeiro confira os arquivos e a granularidade; depois compare receita e contribuição por canal; por fim, recomende uma prioridade com base nos achados.",
+            "question": "Como esse princípio melhoraria sua tentativa inicial?"
+          }
+        },
+        {
+          "title": "E · Explícito",
+          "letter": "E",
+          "english": "Explicit",
+          "body": "Defina as fontes, as restrições e o formato esperado para a resposta.",
+          "detail": {
+            "explanation": "Torne verificáveis os requisitos da entrega: recorte, fórmulas, fontes e formato. Detalhes precisos reduzem a necessidade de a IA adivinhar o que você espera.",
+            "example": "Use somente nucleo-casa-mensal.csv e LEIA-ME.md anexados, com meses encerrados até novembro/2025. Entregue até três achados em tabela com período, fórmula e IDs das linhas, seguidos de uma recomendação. Não deduza lucro líquido, caixa ou LTV.",
+            "question": "Como esse princípio melhoraria sua tentativa inicial?"
+          }
+        },
+        {
+          "title": "A · Adaptável",
+          "letter": "A",
+          "english": "Adaptive",
+          "body": "Ajuste o pedido conforme os dados disponíveis e as lacunas da conversa.",
+          "detail": {
+            "explanation": "Adaptar é revisar a instrução após observar a resposta. O trecho destacado cria uma condição de ajuste; na próxima rodada, a liderança decide que informação acrescentar ou que escopo reduzir.",
+            "example": "Se um arquivo não estiver acessível ou faltar um campo necessário, explique a lacuna e peça a informação antes de concluir essa parte. Prossiga no escopo verificável; na próxima rodada, ajustaremos o pedido aos dados disponíveis.",
+            "question": "Como esse princípio melhoraria sua tentativa inicial?"
+          }
+        },
+        {
+          "title": "R · Reflexivo",
+          "letter": "R",
+          "english": "Reflective",
+          "body": "Confira a resposta e use as falhas para melhorar o próximo prompt.",
+          "detail": {
+            "explanation": "Reflexão faz parte do ciclo de melhoria. A autoverificação solicitada à IA é um apoio; a pessoa precisa conferir a fonte, avaliar o resultado e revisar o prompt.",
+            "example": "Antes de finalizar, confira os totais e denominadores, separe fatos de hipóteses e indique uma evidência que mudaria a recomendação. Apresente cálculos reproduzíveis; se não os executar, marque os números como não verificados. Eu conferirei um cálculo e usarei as falhas para revisar este prompt.",
+            "question": "Como esse princípio melhoraria sua tentativa inicial?"
+          }
+        }
+      ],
+      "clearExample": [
+        {
+          "letter": "C",
+          "text": "Avalie se a Núcleo Casa cresceu com qualidade entre janeiro/2023 e novembro/2025 para orientar as prioridades de Q1/2026."
+        },
+        {
+          "letter": "L",
+          "text": "Primeiro confira os arquivos e a granularidade; depois compare receita e contribuição por canal; por fim, recomende uma prioridade com base nos achados."
+        },
+        {
+          "letter": "E",
+          "text": "Use somente nucleo-casa-mensal.csv e LEIA-ME.md anexados, com meses encerrados até novembro/2025. Entregue até três achados em tabela com período, fórmula e IDs das linhas, seguidos de uma recomendação. Não deduza lucro líquido, caixa ou LTV."
+        },
+        {
+          "letter": "A",
+          "text": "Se um arquivo não estiver acessível ou faltar um campo necessário, explique a lacuna e peça a informação antes de concluir essa parte. Prossiga no escopo verificável; na próxima rodada, ajustaremos o pedido aos dados disponíveis."
+        },
+        {
+          "letter": "R",
+          "text": "Antes de finalizar, confira os totais e denominadores, separe fatos de hipóteses e indique uma evidência que mudaria a recomendação. Apresente cálculos reproduzíveis; se não os executar, marque os números como não verificados. Eu conferirei um cálculo e usarei as falhas para revisar este prompt."
+        }
+      ],
+      "source": {
+        "title": "Leo S. Lo · The CLEAR path (2023)",
+        "url": "https://doi.org/10.1016/j.acalib.2023.102720"
+      }
+    },
+    {
       "id": "anatomia",
       "chapter": "Prompts",
-      "title": "Não peça “uma análise”. Enquadre uma decisão.",
+      "title": "Enquadre a decisão antes de pedir a análise.",
       "lead": "Papel + contexto + fontes + tarefa + critérios + formato de saída.",
       "cards": [
         {
           "title": "Papel não é credencial",
-          "body": "“Atue como CFO” muda a perspectiva; não transforma a IA em um especialista validado."
+          "body": "Defina a perspectiva da análise, lembrando que assumir um papel não comprova experiência nem precisão da resposta.",
+          "detail": {
+            "explanation": "O papel direciona prioridades e vocabulário. Pedir a visão de CFO pode enfatizar margem e cenário, mas não valida os cálculos. O resultado continua dependendo de fontes adequadas e de revisão humana.",
+            "example": "“Atue como CFO” ganha utilidade com “compare receita e contribuição, cite as fórmulas e não deduza caixa sem os dados necessários”.",
+            "question": "Qual responsabilidade dessa cadeira deve orientar a análise?"
+          }
         },
         {
           "title": "Critério antes da resposta",
-          "body": "Diga como serão verificadas fórmulas, evidências e recomendações."
+          "body": "Defina antes os critérios de qualidade: fontes rastreáveis, cálculos reproduzíveis e recomendações ligadas à decisão.",
+          "detail": {
+            "explanation": "Critérios claros permitem avaliar a resposta pelo que ela entrega. Especifique quais evidências serão exigidas, como conferir números e como separar hipótese de fato. Isso reduz a avaliação baseada apenas em texto convincente.",
+            "example": "Peça uma tabela com achado, fonte, período, fórmula, limite e implicação para a decisão.",
+            "question": "Como você reconheceria uma resposta boa antes de ler o resultado?"
+          }
         },
         {
           "title": "Limite explícito",
-          "body": "Uma resposta útil também diz o que não pode concluir."
+          "body": "Diga o que está fora do escopo e peça que a IA reconheça lacunas antes de apresentar conclusões.",
+          "detail": {
+            "explanation": "O prompt deve permitir uma resposta parcial quando a base não sustenta o pedido. Instrua a IA a apontar o dado faltante e a continuar apenas no escopo verificável, sem preencher números por conveniência.",
+            "example": "“Não calcule LTV com esta base. Se a decisão depender de retenção, descreva quais dados de coorte faltam”.",
+            "question": "Qual conclusão a base disponível não permite sustentar?"
+          }
         }
       ],
       "prompts": [
@@ -132,20 +300,35 @@
     {
       "id": "base",
       "chapter": "Dados",
-      "title": "Faça a pergunta que a base consegue responder.",
+      "title": "Pergunte o que a base consegue responder.",
       "lead": "Uma ausência bem identificada vale mais que uma métrica inventada.",
       "cards": [
         {
           "title": "Calculável",
-          "body": "Receita, margens definidas, CAC gerencial, atrasos e NPS ponderado."
+          "body": "Calcule receita, margens definidas, CAC gerencial e indicadores de serviço usando as fórmulas e os recortes do dicionário.",
+          "detail": {
+            "explanation": "Uma métrica calculável depende de campos disponíveis e definição explícita. Taxas do grupo devem ser refeitas a partir dos totais, respeitando o denominador; médias simples de percentuais podem distorcer a leitura.",
+            "example": "Para a taxa de atraso de um canal, divida o total de pedidos atrasados pelo total de pedidos desse canal no período.",
+            "question": "O denominador representa exatamente o grupo que você quer avaliar?"
+          }
         },
         {
           "title": "Fonte adicional",
-          "body": "Pessoas e estoque exigem as tabelas mensais específicas."
+          "body": "Use as tabelas mensais de pessoas e estoque para essas análises, respeitando o nível de agregação de cada fonte.",
+          "detail": {
+            "explanation": "Fontes complementares respondem a perguntas diferentes. Confira unidade e período antes de cruzar tabelas. Vendas precisam ser consolidadas por mês para comparar com folha, quadro e estoque sem duplicar valores.",
+            "example": "Some as vendas do mês e só então relacione com a única linha mensal de estoque.",
+            "question": "O cruzamento preserva os totais originais de cada tabela?"
+          }
         },
         {
           "title": "Indisponível",
-          "body": "LTV, recompra, fluxo de caixa, transportadora e desempenho individual."
+          "body": "Reconheça as lacunas: a base não sustenta LTV, recompra, fluxo de caixa nem avaliações de desempenho individual.",
+          "detail": {
+            "explanation": "A ausência de dados delimita a resposta. Uma métrica parecida não substitui a variável que falta. É melhor apresentar um plano de coleta do que criar uma conclusão com aparência de precisão.",
+            "example": "Para estudar retenção, solicite IDs de clientes e histórico de compras em um contexto autorizado; o arquivo atual só permite analisar pedidos agregados.",
+            "question": "Qual coleta adicional mais reduziria a incerteza da decisão?"
+          }
         }
       ],
       "prompts": [
@@ -165,23 +348,48 @@
       "cards": [
         {
           "title": "CEO · direção",
-          "body": "Escolhas, renúncias e reversibilidade."
+          "body": "Escolha prioridades, explicite renúncias e teste decisões antes de ampliar o compromisso.",
+          "detail": {
+            "explanation": "A perspectiva de CEO conecta áreas e arbitra escolhas. O foco é combinar oportunidade, risco e capacidade, sem assumir que todas as iniciativas cabem no mesmo orçamento.",
+            "example": "Compare investir em logística, aquisição e B2B; mostre o que fica para depois e quais sinais justificariam rever a prioridade.",
+            "question": "Qual renúncia acompanha a prioridade escolhida?"
+          }
         },
         {
           "title": "CFO · valor",
-          "body": "Margem, capital e disciplina de cenário."
+          "body": "Investigue margens e qualidade do crescimento, distinguindo dados de premissas financeiras.",
+          "detail": {
+            "explanation": "A perspectiva de CFO exige distinguir vendas de resultado e de caixa. Analise os componentes disponíveis e explicite o que falta para uma conclusão financeira completa.",
+            "example": "Compare contribuição entre canais sem apresentar o orçamento hipotético do conselho como saldo bancário observado.",
+            "question": "O cenário separa dados medidos de premissas propostas?"
+          }
         },
         {
           "title": "COO · execução",
-          "body": "Capacidade, estoque e nível de serviço."
+          "body": "Relacione capacidade, estoque e serviço para localizar gargalos e medir intervenções.",
+          "detail": {
+            "explanation": "A perspectiva de COO pergunta se a operação consegue cumprir a promessa. Use atrasos, ruptura e estoque para localizar sinais; a base agregada não comprova a causa de cada falha.",
+            "example": "Investigue meses com piora do atraso e proponha uma coleta adicional antes de atribuir o problema a uma transportadora.",
+            "question": "Qual evidência distinguiria um problema de capacidade de outra causa?"
+          }
         },
         {
           "title": "CMO · demanda",
-          "body": "Aquisição, atribuição e experimentos."
+          "body": "Avalie aquisição por canal, considerando margem, atribuição e capacidade de atendimento.",
+          "detail": {
+            "explanation": "A perspectiva de CMO relaciona investimento e demanda sem extrapolar a atribuição disponível. Um CAC gerencial não demonstra sozinho o retorno incremental de uma campanha.",
+            "example": "Proponha um experimento de aquisição com limite de investimento e acompanhamento de margem e serviço.",
+            "question": "Como saber se o resultado veio da ação proposta ou de outro fator?"
+          }
         },
         {
           "title": "CHRO · pessoas",
-          "body": "Capacidade agregada e risco de execução."
+          "body": "Observe a capacidade agregada da equipe, sem tirar conclusões sobre pessoas individuais.",
+          "detail": {
+            "explanation": "A perspectiva de CHRO usa sinais agregados para formular perguntas sobre carga e capacidade. Não há dados individuais nem evidência suficiente para diagnosticar motivação ou desempenho pessoal.",
+            "example": "Compare horas extras e absenteísmo por mês e trate possíveis causas como hipóteses a investigar.",
+            "question": "Que conversa ou dado complementar ajudaria a interpretar esse sinal?"
+          }
         }
       ],
       "prompts": [],
@@ -197,11 +405,21 @@
       "cards": [
         {
           "title": "Pergunta da cadeira",
-          "body": "Definir direção estratégica"
+          "body": "Compare prioridades de crescimento e seus riscos, deixando claro o que avançar, adiar ou testar em menor escala.",
+          "detail": {
+            "explanation": "A decisão estratégica precisa conectar análise e escolha. Peça alternativas viáveis, critérios comuns e uma recomendação que reconheça as renúncias e dependências entre áreas.",
+            "example": "Solicite três opções para Q1/2026, com duas evidências por opção, risco principal e condição de reversão.",
+            "question": "A recomendação ainda faz sentido se a principal premissa falhar?"
+          }
         },
         {
           "title": "Disciplina comum",
-          "body": "Cite fontes, confira o cálculo e proponha uma contraprova."
+          "body": "Sustente a prioridade com fontes e cálculos; procure também evidências que possam contrariar a recomendação.",
+          "detail": {
+            "explanation": "Uma escolha fica mais robusta quando enfrenta uma objeção relevante. Confira se as fontes citadas sustentam o argumento e peça um cenário em que outra alternativa seria preferível.",
+            "example": "Se a IA priorizar expansão, pergunte quais sinais de margem ou serviço justificariam adiar essa escolha.",
+            "question": "Qual contraprova mudaria a ordem das prioridades?"
+          }
         }
       ],
       "prompts": [
@@ -221,11 +439,21 @@
       "cards": [
         {
           "title": "Pergunta da cadeira",
-          "body": "Diagnosticar qualidade do crescimento"
+          "body": "Investigue se o aumento das vendas preserva contribuição e margem, separando resultados calculados de hipóteses financeiras.",
+          "detail": {
+            "explanation": "Compare os componentes de receita e custo no mesmo período. A base permite discutir margens definidas no dicionário, mas não contém todos os elementos de lucro líquido ou fluxo de caixa.",
+            "example": "Peça uma ponte entre receita, deduções e contribuição por canal, com fórmulas e linhas utilizadas.",
+            "question": "O crescimento observado está acompanhado de melhora da margem definida?"
+          }
         },
         {
           "title": "Disciplina comum",
-          "body": "Cite fontes, confira o cálculo e proponha uma contraprova."
+          "body": "Confira fórmulas, denominadores e premissas de cenário antes de usar um indicador para justificar investimento.",
+          "detail": {
+            "explanation": "Uma pequena diferença de definição pode mudar a conclusão. Use taxas calculadas pelos totais do recorte e rotule premissas futuras. Refaça pelo menos um cálculo de forma independente.",
+            "example": "Recalcule a margem de contribuição com os totais do canal, em vez de tirar a média das margens mensais.",
+            "question": "Qual premissa mais altera a recomendação financeira?"
+          }
         }
       ],
       "prompts": [
@@ -245,11 +473,21 @@
       "cards": [
         {
           "title": "Pergunta da cadeira",
-          "body": "Investigar nível de serviço"
+          "body": "Localize variações em atrasos, ruptura e estoque para investigar onde a operação perde capacidade de atender bem.",
+          "detail": {
+            "explanation": "Comece pelo sintoma e pelo recorte que a base permite observar. Identificar uma piora em determinado mês ou canal ajuda a priorizar investigação, mas não comprova a causa operacional.",
+            "example": "Peça os períodos de maior atraso, o volume afetado e os dados adicionais necessários para investigar o gargalo.",
+            "question": "O problema aparece em todo o negócio ou em um recorte específico?"
+          }
         },
         {
           "title": "Disciplina comum",
-          "body": "Cite fontes, confira o cálculo e proponha uma contraprova."
+          "body": "Valide os indicadores de serviço e teste explicações alternativas antes de atribuir uma causa ao gargalo.",
+          "detail": {
+            "explanation": "Uma correlação entre estoque e atraso pode ter mais de uma explicação. Verifique as fontes e proponha uma coleta ou piloto capaz de distinguir as hipóteses relevantes.",
+            "example": "Compare taxa e quantidade de atrasos; depois indique quais dados de entrega ajudariam a avaliar cada hipótese.",
+            "question": "Que observação faria você abandonar a explicação inicial?"
+          }
         }
       ],
       "prompts": [
@@ -269,11 +507,21 @@
       "cards": [
         {
           "title": "Pergunta da cadeira",
-          "body": "Analisar aquisição com disciplina"
+          "body": "Compare aquisição por canal considerando investimento, clientes atribuídos, contribuição e limites dos dados disponíveis.",
+          "detail": {
+            "explanation": "O objetivo é avaliar oportunidades sem confundir atribuição gerencial com causalidade. Use o dicionário para o CAC e evite conclusões de LTV ou retenção sem histórico por cliente.",
+            "example": "Peça um comparativo por canal com CAC gerencial, contribuição e uma proposta de teste com orçamento limitado.",
+            "question": "A aquisição proposta mantém margem e capacidade de atendimento?"
+          }
         },
         {
           "title": "Disciplina comum",
-          "body": "Cite fontes, confira o cálculo e proponha uma contraprova."
+          "body": "Confira as fontes de aquisição e proponha um experimento que ajude a separar efeito da campanha de outros fatores.",
+          "detail": {
+            "explanation": "Resultados comerciais também variam com sazonalidade, preço e operação. Uma comparação simples entre períodos não isola o efeito do marketing. Explicite essas limitações no pedido.",
+            "example": "Solicite uma hipótese de campanha, um grupo de comparação quando viável e critérios de continuar ou interromper.",
+            "question": "Qual indicador mostraria qualidade da demanda além de volume?"
+          }
         }
       ],
       "prompts": [
@@ -293,11 +541,21 @@
       "cards": [
         {
           "title": "Pergunta da cadeira",
-          "body": "Avaliar capacidade agregada"
+          "body": "Relacione quadro médio, horas extras e absenteísmo para investigar se a capacidade acompanha o plano do negócio.",
+          "detail": {
+            "explanation": "Os dados de pessoas são mensais e consolidados. Eles ajudam a formular perguntas sobre carga de trabalho, mas não permitem comparar indivíduos ou afirmar causas de saúde e motivação.",
+            "example": "Peça uma leitura mensal de horas extras e absenteísmo, com hipóteses alternativas e perguntas para validação com a área.",
+            "question": "Qual sinal agregado merece investigação antes de ampliar a operação?"
+          }
         },
         {
           "title": "Disciplina comum",
-          "body": "Cite fontes, confira o cálculo e proponha uma contraprova."
+          "body": "Valide taxas e períodos e proponha perguntas de investigação, preservando os limites de uma base agregada de pessoas.",
+          "detail": {
+            "explanation": "Antes de relacionar quadro e vendas, consolide as tabelas por mês. Evite transformar associação em avaliação individual. Recomendações devem ser acompanhadas por pessoas responsáveis pelo contexto.",
+            "example": "Confira a fórmula de absenteísmo no dicionário e não use vendas por quadro médio como nota de produtividade individual.",
+            "question": "A conclusão descreve um sinal do sistema ou faz um julgamento que os dados não sustentam?"
+          }
         }
       ],
       "prompts": [
@@ -313,19 +571,34 @@
       "id": "desafio-cadeira",
       "chapter": "Prática",
       "title": "Sua cadeira. Sua recomendação.",
-      "lead": "Escolha a função, execute o prompt e envie uma resposta com evidências. A turma verá somente o que for autorizado e aprovado.",
+      "lead": "Escolha uma função e produza uma recomendação. Compartilhe com a turma após autorização e aprovação.",
       "cards": [
         {
           "title": "Duas evidências",
-          "body": "Número, período e ID da fonte."
+          "body": "Escolha dois achados que sustentem a recomendação, sempre com número, período, fórmula e identificação da fonte.",
+          "detail": {
+            "explanation": "Evidências devem contribuir para a decisão, não apenas decorar a resposta. Prefira dois achados relevantes e conferidos a uma lista extensa de indicadores sem ligação com a proposta.",
+            "example": "Para recomendar um piloto operacional, mostre o indicador de serviço e a contribuição do recorte afetado, com fontes verificadas.",
+            "question": "Esses dois achados realmente sustentam a ação proposta?"
+          }
         },
         {
           "title": "Uma contraprova",
-          "body": "O que faria você mudar de opinião?"
+          "body": "Descreva qual evidência ou cenário faria o grupo mudar de opinião e revisar a recomendação inicial.",
+          "detail": {
+            "explanation": "A contraprova testa a resistência da conclusão. Peça uma explicação alternativa plausível e identifique o dado capaz de diferenciá-la da hipótese preferida.",
+            "example": "Se a queda da contribuição parecer ligada a frete, verifique se mudanças no mix de canal também explicariam a variação.",
+            "question": "O que você precisaria observar para preferir outra alternativa?"
+          }
         },
         {
           "title": "Um guardrail",
-          "body": "Qual limite deve impedir ou interromper a ação?"
+          "body": "Defina um limite de orçamento, risco ou serviço que impeça o avanço ou sinalize a hora de interromper a ação.",
+          "detail": {
+            "explanation": "Um guardrail é uma condição explícita de proteção. Precisa ter indicador, responsável e consequência. Um limite proposto para o piloto deve ser rotulado como proposta, não como política já existente.",
+            "example": "“Interromper o piloto se ultrapassar o teto aprovado; revisar semanalmente margem e serviço com o responsável da operação”.",
+            "question": "Quem acompanha o limite e o que acontece quando ele é atingido?"
+          }
         }
       ],
       "prompts": [],
@@ -336,16 +609,26 @@
     {
       "id": "revisao",
       "chapter": "Prática",
-      "title": "A primeira resposta não precisa ser a última.",
+      "title": "Revise o prompt. Compare a resposta.",
       "lead": "Volte à pergunta inicial. Acrescente contexto, evidência e critérios. Registre o que mudou.",
       "cards": [
         {
           "title": "Controle as variáveis",
-          "body": "Mesma base e, quando possível, mesmo modelo e configuração."
+          "body": "Mantenha arquivos, modelo e configurações semelhantes para observar com mais clareza o efeito das novas instruções.",
+          "detail": {
+            "explanation": "A comparação é exploratória: mesmo com condições parecidas, a IA pode variar a resposta. Registre o que foi mantido e o que mudou para interpretar o resultado com honestidade.",
+            "example": "Reutilize os mesmos anexos e modelo; altere o prompt incluindo fonte, fórmula, limite e formato esperado.",
+            "question": "Além do prompt, o que mudou entre as duas tentativas?"
+          }
         },
         {
           "title": "Compare de verdade",
-          "body": "Procure número inventado, lacuna reconhecida e ação verificável."
+          "body": "Procure melhora na rastreabilidade, nos limites reconhecidos e na utilidade da ação, além da aparência do texto.",
+          "detail": {
+            "explanation": "Compare trechos e cálculos com os mesmos critérios da rubrica. Uma resposta mais longa pode continuar errada. Registre uma melhoria verificável e uma falha que ainda permanece.",
+            "example": "A versão B mostra o denominador e reconhece a ausência de caixa, mas ainda precisa conferir um total: registre ambos.",
+            "question": "Qual melhoria você consegue demonstrar nas fontes?"
+          }
         }
       ],
       "prompts": [
@@ -360,20 +643,35 @@
     {
       "id": "rag",
       "chapter": "Evidência",
-      "title": "RAG oferece fontes. A verificação continua sendo necessária.",
+      "title": "RAG encontra fontes. Você verifica.",
       "lead": "Recuperar documentos, calcular indicadores e validar conclusões são etapas diferentes.",
       "cards": [
         {
           "title": "Texto",
-          "body": "Recupere documentos e cite IDs de fonte."
+          "body": "Recupere os documentos pertinentes e peça citações identificáveis para conferir se o texto sustenta a conclusão.",
+          "detail": {
+            "explanation": "RAG combina recuperação de fontes com geração de resposta. O trecho recuperado pode estar incompleto, desatualizado ou fora de contexto; citar um documento não dispensa a leitura da passagem relevante.",
+            "example": "Peça que uma recomendação cite POL-01 ou LOG-01 apenas quando o conteúdo desses documentos realmente apoiar a afirmação.",
+            "question": "O trecho citado diz o que a resposta afirma?"
+          }
         },
         {
           "title": "Números",
-          "body": "Use consulta e cálculo reproduzível. Busca semântica não soma uma planilha."
+          "body": "Solicite consulta e cálculo reproduzível para os indicadores; encontrar um trecho não equivale a somar os dados.",
+          "detail": {
+            "explanation": "Busca em texto ajuda a localizar informação. Totais, taxas e comparações exigem operações sobre os registros adequados. Peça o procedimento e a fórmula; números não calculados devem ser marcados como não verificados.",
+            "example": "Para comparar contribuição por canal, agrupe o CSV, some os componentes e recalcule a margem usando os totais.",
+            "question": "Você consegue reproduzir o número com as linhas e a fórmula informadas?"
+          }
         },
         {
           "title": "Sem evidência",
-          "body": "Declare que a resposta não é sustentada e peça a fonte necessária."
+          "body": "Peça que a IA reconheça uma conclusão sem suporte e indique a fonte necessária para avançar na investigação.",
+          "detail": {
+            "explanation": "Uma boa resposta delimita o que sabe. Se o documento ou campo necessário não estiver disponível, a IA deve explicar a lacuna e separar qualquer hipótese das conclusões sustentadas.",
+            "example": "“Não há detalhamento por transportadora nos anexos. Posso localizar o período de piora, mas não atribuir a responsabilidade”.",
+            "question": "Qual fonte faltante seria suficiente para testar a hipótese?"
+          }
         }
       ],
       "prompts": [
@@ -388,20 +686,35 @@
     {
       "id": "dashboard",
       "chapter": "Visualização",
-      "title": "Uma tela que responda. Não apenas uma tela bonita.",
+      "title": "Uma tela para orientar a decisão.",
       "lead": "Cada KPI precisa de fórmula, recorte, comparativo e decisão associada.",
       "cards": [
         {
           "title": "Saúde do negócio",
-          "body": "O que merece atenção?"
+          "body": "Selecione indicadores de margem, demanda e serviço, com comparações que orientem a atenção.",
+          "detail": {
+            "explanation": "A primeira camada do dashboard precisa ajudar a perceber o que mudou e por que merece investigação. Escolha até seis KPIs e inclua definição, período e referência de comparação.",
+            "example": "Mostre contribuição e atraso com comparação temporal; evite cartões com números isolados sem unidade ou recorte.",
+            "question": "Que decisão cada indicador ajuda a tomar?"
+          }
         },
         {
           "title": "Investigação",
-          "body": "Qual recorte explica a variação?"
+          "body": "Use período, canal e região para investigar variações, sem confundir associação com causa.",
+          "detail": {
+            "explanation": "A investigação deve preservar a definição das métricas ao filtrar. Explique como taxas são recalculadas e indique quando o recorte não possui dados suficientes.",
+            "example": "Ao selecionar E-commerce, recalcule atraso por totais desse canal e mantenha visível o período selecionado.",
+            "question": "O filtro muda o denominador e isso fica claro para quem lê?"
+          }
         },
         {
           "title": "Ação",
-          "body": "Quem faz o quê, com qual limite?"
+          "body": "Associe cada sinal a um responsável, uma intervenção e um critério de acompanhamento.",
+          "detail": {
+            "explanation": "Uma visualização útil aproxima a leitura do próximo passo. Nem todo alerta exige ação imediata; alguns exigem validar o dado ou coletar informação antes de decidir.",
+            "example": "Ao observar piora de serviço, indique responsável pela investigação, dado complementar e data de retorno ao grupo.",
+            "question": "O usuário sabe o que fazer depois de olhar a tela?"
+          }
         }
       ],
       "prompts": [
@@ -421,23 +734,48 @@
       "cards": [
         {
           "title": "Contexto",
-          "body": "Decisão, papel, escopo e restrições."
+          "body": "Verifique se a decisão, a perspectiva e o escopo estão bem definidos.",
+          "detail": {
+            "explanation": "Avalie se outra pessoa compreenderia o problema sem depender da conversa anterior. Uma menção genérica ao negócio não substitui objetivo e escopo.",
+            "example": "“Analise vendas” é vago. “Compare canais até novembro/2025 para priorizar um piloto em Q1/2026” delimita a decisão.",
+            "question": "Qual informação de contexto ainda faria a resposta mudar?"
+          }
         },
         {
           "title": "Evidência",
-          "body": "Fontes e períodos rastreáveis."
+          "body": "Exija fontes e períodos que permitam localizar e conferir cada achado.",
+          "detail": {
+            "explanation": "A nota deve refletir a ligação entre conclusão e fonte. Listar anexos ao final não demonstra que cada afirmação tem suporte. Confira um achado na origem antes de avaliar.",
+            "example": "Procure o arquivo e o recorte que sustentam a recomendação principal e confirme se a conclusão respeita esses dados.",
+            "question": "A fonte citada sustenta a afirmação ou apenas trata do mesmo assunto?"
+          }
         },
         {
           "title": "Verificabilidade",
-          "body": "Fórmulas, denominadores e consistência."
+          "body": "Confira fórmulas, denominadores e totais para reproduzir os indicadores e encontrar inconsistências.",
+          "detail": {
+            "explanation": "Verificabilidade é a possibilidade de refazer a conferência. Um número correto sem método é mais difícil de auditar; um método explícito permite localizar o erro.",
+            "example": "Recalcule uma taxa com o numerador e denominador apresentados e confronte o total com a fonte.",
+            "question": "Alguém conseguiria refazer esse cálculo sem adivinhar etapas?"
+          }
         },
         {
           "title": "Limites",
-          "body": "Incertezas, lacunas e contraprovas."
+          "body": "Observe se a resposta reconhece lacunas, hipóteses e possíveis contraprovas.",
+          "detail": {
+            "explanation": "Limites precisam ser específicos ao problema. Um aviso genérico de que a IA pode errar não informa qual dado falta nem como isso restringe a decisão.",
+            "example": "Uma resposta sobre aquisição deve reconhecer a ausência de coortes antes de discutir retenção ou LTV.",
+            "question": "A incerteza identificada altera alguma parte da recomendação?"
+          }
         },
         {
           "title": "Ação",
-          "body": "Próximo passo, responsável e critério de revisão."
+          "body": "Procure um próximo passo com responsável, indicador e condição de revisão.",
+          "detail": {
+            "explanation": "A recomendação deve permitir acompanhamento. Avalie se o plano conecta evidência, ação e verificação, distinguindo metas propostas de resultados já observados.",
+            "example": "“Melhorar logística” é insuficiente. Um piloto com dono, escopo, limite e revisão é acompanhável.",
+            "question": "O grupo saberia como começar e quando reavaliar?"
+          }
         }
       ],
       "prompts": [
@@ -456,15 +794,30 @@
       "cards": [
         {
           "title": "Sem exposição automática",
-          "body": "A turma só acessa envios com autorização e aprovação."
+          "body": "Compartilhe apenas tentativas autorizadas pelo participante e aprovadas pelo facilitador para a discussão da turma.",
+          "detail": {
+            "explanation": "Autorizar o compartilhamento e aprovar a exibição são etapas diferentes. A revisão permite selecionar exemplos úteis à aula; o envio continua privado enquanto não reunir as duas condições.",
+            "example": "Após o participante autorizar, o facilitador revisa o resultado e marca “Exibir na turma” antes de abrir a galeria.",
+            "question": "O exemplo escolhido já tem autorização e aprovação?"
+          }
         },
         {
           "title": "Pseudônimos",
-          "body": "Resultados compartilhados usam um alias, não o nome do aluno."
+          "body": "A galeria identifica os envios por alias; revise também o texto e os anexos para evitar identificação desnecessária.",
+          "detail": {
+            "explanation": "O alias substitui o nome exibido do participante na galeria. Ele não remove nomes ou informações escritos dentro da própria resposta, por isso o conteúdo também precisa ser revisado.",
+            "example": "Use “Participante 001” na discussão e confira se o resultado não contém assinatura pessoal ou dados de terceiros.",
+            "question": "O conteúdo compartilhado permite focar na técnica sem expor a pessoa?"
+          }
         },
         {
           "title": "Aprendizado coletivo",
-          "body": "Discuta uma melhoria concreta, não quem “venceu”."
+          "body": "Compare instruções, fontes e limites para identificar uma melhoria concreta que todos possam aplicar aos próprios prompts.",
+          "detail": {
+            "explanation": "A comparação serve para aprender com diferentes escolhas. Observe uma instrução que funcionou, uma falha e uma revisão possível, sem transformar a rubrica em competição entre pessoas.",
+            "example": "Mostre como pedir o denominador tornou a resposta mais verificável e convide a turma a adaptar essa instrução.",
+            "question": "Qual melhoria desse exemplo você levaria para sua próxima tentativa?"
+          }
         }
       ],
       "prompts": [],
@@ -480,15 +833,30 @@
       "cards": [
         {
           "title": "Cada cadeira",
-          "body": "Duas evidências, uma objeção, uma incerteza e um guardrail."
+          "body": "Defenda uma prioridade com duas evidências, uma objeção, uma incerteza e um limite de proteção para a proposta.",
+          "detail": {
+            "explanation": "As cadeiras simulam responsabilidades distintas. Cada uma deve explicitar o que quer proteger e onde sua recomendação pode falhar. Perspectivas geradas pela mesma IA não são avaliações independentes.",
+            "example": "O COO pode priorizar serviço enquanto o CMO propõe aquisição; ambos precisam demonstrar como suas escolhas respeitam margem e capacidade.",
+            "question": "Qual tensão entre áreas precisa aparecer na decisão?"
+          }
         },
         {
           "title": "Na convergência",
-          "body": "A soma deve fechar, e divergências precisam ser preservadas."
+          "body": "Distribua o orçamento completo, incluindo reserva, e registre as divergências que permaneceram após a escolha.",
+          "detail": {
+            "explanation": "O orçamento de R$ 1,2 milhão é hipotético, não caixa observado. A soma precisa fechar sem apagar objeções. Na simulação de 15/12/2025, use meses encerrados até novembro para sustentar a decisão.",
+            "example": "Confira se logística + aquisição + B2B + reserva somam exatamente R$ 1.200.000 e registre uma alternativa descartada.",
+            "question": "Que objeção continua válida mesmo depois de decidir?"
+          }
         },
         {
           "title": "Na revisão",
-          "body": "Responsáveis por função, métricas e revisão em 30 dias."
+          "body": "Defina responsáveis por função, indicadores e revisão em 30 dias para acompanhar se a decisão continua fazendo sentido.",
+          "detail": {
+            "explanation": "A ata deve indicar como o grupo voltará à escolha. Defina quais evidências serão coletadas e que sinais levariam a ampliar, corrigir ou interromper uma iniciativa.",
+            "example": "Agende uma revisão conjunta de CFO e COO para conferir gasto, contribuição e serviço antes de liberar nova etapa do piloto.",
+            "question": "Qual sinal exigiria revisão antes dos 30 dias?"
+          }
         }
       ],
       "prompts": [
@@ -503,16 +871,26 @@
     {
       "id": "conselho-pratica",
       "chapter": "Prática",
-      "title": "O conselho decide. A ata preserva o porquê.",
+      "title": "Decida e registre o porquê.",
       "lead": "Produza uma alocação e confira orçamento, reserva, alternativas descartadas e gatilhos de parada.",
       "cards": [
         {
           "title": "Entregável",
-          "body": "Prompt + ata + conferência do orçamento."
+          "body": "Registre o prompt, a ata e a conferência dos valores, preservando critérios, reserva e alternativas discutidas.",
+          "detail": {
+            "explanation": "A ata deve permitir entender o que foi decidido e por quê. Inclua evidências, divergências, responsáveis e revisão; mantenha o prompt para que o grupo possa avaliar como a discussão foi conduzida.",
+            "example": "Entregue uma tabela de alocação, uma objeção não resolvida e a memória da soma do orçamento.",
+            "question": "Quem não participou da discussão conseguiria acompanhar a decisão pela ata?"
+          }
         },
         {
           "title": "Verificação",
-          "body": "O total fecha? Os números citados existem? O plano reconhece seus limites?"
+          "body": "Confira se a soma fecha, as evidências existem e o plano explicita restrições, incertezas e gatilhos de parada.",
+          "detail": {
+            "explanation": "Revise a consistência antes de avaliar a qualidade da redação. Orçamento incompatível, fonte inexistente ou premissa tratada como fato precisam ser destacados, não corrigidos silenciosamente.",
+            "example": "Refaça a soma da alocação e confira dois números citados nas fontes, respeitando o corte temporal do conselho.",
+            "question": "Qual inconsistência impediria aprovar esta ata?"
+          }
         }
       ],
       "prompts": [
@@ -532,15 +910,30 @@
       "cards": [
         {
           "title": "Antes",
-          "body": "Meça tempo e qualidade atuais."
+          "body": "Escolha uma tarefa recorrente e meça o tempo e a qualidade antes de testar o prompt.",
+          "detail": {
+            "explanation": "Defina uma tarefa suficientemente específica para comparar. Meça também revisão e retrabalho, não só o tempo de produzir a primeira versão. Estabeleça um critério simples de qualidade.",
+            "example": "Durante a preparação de um resumo semanal, anote minutos gastos e quantidade de correções antes de usar a nova instrução.",
+            "question": "Como você saberá se ganhou tempo sem perder qualidade?"
+          }
         },
         {
           "title": "Durante",
-          "body": "Teste o prompt com dados permitidos e revisão humana."
+          "body": "Teste com dados permitidos e revisão humana; registre os ajustes e as falhas durante a semana.",
+          "detail": {
+            "explanation": "O teste deve caber na rotina e permitir aprender. Use fontes autorizadas no seu ambiente de trabalho; nesta sala, descreva somente o plano sem compartilhar informações confidenciais.",
+            "example": "Teste o mesmo formato de resumo em tarefas semelhantes e registre quais partes ainda precisam ser refeitas por uma pessoa.",
+            "question": "Que tipo de erro deve interromper o uso e exigir revisão do processo?"
+          }
         },
         {
           "title": "Depois",
-          "body": "Meça ganho, falhas e decisão de continuar ou parar."
+          "body": "Compare tempo, qualidade e retrabalho para decidir se continua, ajusta ou encerra o teste.",
+          "detail": {
+            "explanation": "Economia de tempo precisa ser medida incluindo conferência. Um resultado rápido que aumenta retrabalho pode não representar ganho. Registre também limites da comparação e o próximo ajuste.",
+            "example": "Compare o tempo de produção mais revisão antes e depois e avalie se os critérios de qualidade continuaram atendidos.",
+            "question": "Qual evidência justifica continuar por mais uma semana?"
+          }
         }
       ],
       "prompts": [
@@ -553,20 +946,35 @@
     {
       "id": "kit",
       "chapter": "Material",
-      "title": "O workshop termina. O repertório fica.",
+      "title": "O repertório continua com você.",
       "lead": "Leve os exemplos, a base fictícia e suas próprias tentativas para continuar estudando.",
       "cards": [
         {
           "title": "Biblioteca",
-          "body": "33 prompts completos, editáveis, organizados por finalidade."
+          "body": "Explore 33 prompts completos por finalidade e adapte contexto, fontes e formato à decisão que precisa apoiar.",
+          "detail": {
+            "explanation": "A biblioteca reúne variações para fundamentos, auditoria, cadeiras, fontes, visualização e conselho. Os exemplos precisam de adaptação e anexos; copiar o texto sozinho não garante uma análise sustentada.",
+            "example": "Escolha um prompt pela tarefa, confira “Fontes a anexar” e substitua os campos entre colchetes antes de executar.",
+            "question": "O exemplo escolhido corresponde à sua pergunta ou apenas parece interessante?"
+          }
         },
         {
           "title": "Kit de estudo",
-          "body": "Markdown, JSON, CSVs, dicionário e rubrica."
+          "body": "Baixe prompts, planilha, CSVs, dicionário e rubrica para repetir os exercícios e conferir os resultados depois.",
+          "detail": {
+            "explanation": "O kit reúne materiais públicos do caso fictício. Use o dicionário junto das bases e mantenha a versão NC-2026.1 identificada ao comparar resultados. Os envios privados da sala são exportados separadamente.",
+            "example": "Repita um exercício com a planilha e confronte as fórmulas com o dicionário antes de adaptar o método à rotina.",
+            "question": "Quais arquivos são necessários para reproduzir seu exercício favorito?"
+          }
         },
         {
           "title": "Seu percurso",
-          "body": "Exporte seus prompts, resultados e reflexões. Anexos ficam disponíveis na sala enquanto ela existir."
+          "body": "Exporte seus prompts, respostas e reflexões; baixe os anexos separadamente enquanto a sala permanecer disponível.",
+          "detail": {
+            "explanation": "O histórico ajuda a preservar o que foi testado. Rascunhos ficam apenas na aba do navegador e não substituem exportação. A sala tem retenção de sete dias por padrão, contados da criação.",
+            "example": "Use “Exportar minhas tentativas” e faça o download dos anexos que deseja guardar antes do encerramento da retenção.",
+            "question": "Seu registro permite entender a evolução do primeiro prompt até a versão final?"
+          }
         }
       ],
       "prompts": [],
@@ -582,15 +990,30 @@
       "cards": [
         {
           "title": "O que você mudou?",
-          "body": "Qual instrução alterou a qualidade da resposta?"
+          "body": "Identifique uma instrução que melhorou a resposta e explique como ela mudou a utilidade do resultado.",
+          "detail": {
+            "explanation": "Feche o ciclo com uma melhoria observável. Relacione a instrução adicionada ao efeito encontrado e registre o que ainda precisa testar, sem atribuir toda variação a uma única mudança.",
+            "example": "“Pedir fórmula e recorte revelou que a taxa havia sido calculada com o denominador errado”.",
+            "question": "Que instrução você passará a usar de forma intencional?"
+          }
         },
         {
           "title": "O que você verificou?",
-          "body": "Qual conclusão precisava ser conferida?"
+          "body": "Escolha uma conclusão que exigiu conferência e compartilhe como a fonte ou o cálculo ajudou a avaliá-la.",
+          "detail": {
+            "explanation": "A verificação é parte do uso da IA, não uma etapa opcional no final. Guardar um exemplo concreto ajuda a criar o hábito de pedir e conferir evidências antes de agir.",
+            "example": "Conte qual número você refez, em qual arquivo o localizou e se a conclusão mudou depois da conferência.",
+            "question": "O que parecia convincente e só ficou claro após conferir?"
+          }
         },
         {
           "title": "O que vem agora?",
-          "body": "Qual teste vai entrar na sua rotina?"
+          "body": "Defina um teste pequeno para a próxima semana, com tarefa, medida de qualidade e data para avaliar o aprendizado.",
+          "detail": {
+            "explanation": "Transforme o workshop em uma experiência que caiba na agenda. Escolha uma tarefa, uma medida e um próximo passo com revisão humana, sem prometer ganhos ainda não medidos.",
+            "example": "“Na próxima semana vou testar o resumo semanal, medir o tempo total e revisar as correções na sexta-feira”.",
+            "question": "Qual é o primeiro passo que você consegue agendar hoje?"
+          }
         }
       ],
       "prompts": [],

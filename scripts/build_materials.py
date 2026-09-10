@@ -20,6 +20,15 @@ kit='# Prompts para Lideranças | KeyCore Academy\n\nCaso fictício NC-2026.1. S
 for p in content['prompts']:
     kit+=f"## {p['id']} | {p['category']} | {p['title']}\n\nQuando usar: {p['use']}.\n\n```text\n{p['text']}\n```\n\n"
 (ROOT/'resources/kit-prompts.md').write_text(kit.rstrip()+'\n',encoding='utf-8')
+clear = next(slide for slide in content['slides'] if slide['id'] == 'clear')
+clear_guide = '# CLEAR para prompts de liderança\n\n'
+clear_guide += 'Cinco princípios para escrever, testar e revisar. Adaptar e refletir fazem parte da conversa e da avaliação humana, não apenas do texto inicial.\n\n'
+for card in clear['cards']:
+    clear_guide += f"## {card['title']} ({card['english']})\n\n{card['body']}\n\n{card['detail']['explanation']}\n\n"
+clear_guide += '## Exemplo aplicado à Núcleo Casa\n\n```text\n'
+clear_guide += '\n\n'.join(part['text'] for part in clear['clearExample']) + '\n```\n\n'
+clear_guide += f"Referência: [{clear['source']['title']}]({clear['source']['url']}). Exemplo didático próprio do workshop.\n"
+(ROOT/'resources/clear.md').write_text(clear_guide, encoding='utf-8')
 with zipfile.ZipFile(ROOT/'resources/kit-estudo-completo.zip','w',zipfile.ZIP_DEFLATED) as archive:
     for p in sorted((ROOT/'resources').rglob('*')):
         if p.is_file() and p.suffix!='.zip':

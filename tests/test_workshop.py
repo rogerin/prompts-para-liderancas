@@ -175,12 +175,19 @@ def test_public_resources_and_qr(setup):
 
 def test_content_and_data_reconcile():
     root=Path(__file__).resolve().parents[1]
-    assert len(CONTENT['slides'])==23 and len(CONTENT['prompts'])==33 and len(CONTENT['exercises'])==7
+    assert len(CONTENT['slides'])==24 and len(CONTENT['prompts'])==33 and len(CONTENT['exercises'])==7
     assert sum(a['minutes'] for a in CONTENT['agenda'])==150
     ids={p['id'] for p in CONTENT['prompts']};ex={e['id'] for e in CONTENT['exercises']}
     for s in CONTENT['slides']:
         assert all(p in ids for p in s['prompts'])
         assert not s['exercise'] or s['exercise'] in ex
+        for card in s['cards']:
+            assert 10 <= len(card['body'].split()) <= 30
+            assert all(card['detail'].get(key) for key in ('explanation', 'example', 'question'))
+    clear = CONTENT['slides'][4]
+    assert clear['id'] == 'clear'
+    assert [card['letter'] for card in clear['cards']] == list('CLEAR')
+    assert [part['letter'] for part in clear['clearExample']] == list('CLEAR')
     with (root/'resources/dados/nucleo-casa-mensal.csv').open() as f:rows=list(csv.DictReader(f))
     assert len(rows)==432 and len({r['id'] for r in rows})==432
     assert sum(Decimal(r['receita_bruta']) for r in rows)==Decimal('48600000.00')
@@ -189,3 +196,101 @@ def test_content_and_data_reconcile():
         assert Decimal(r['receita_liquida'])==Decimal(r['receita_bruta'])-Decimal(r['descontos'])-Decimal(r['devolucoes_valor'])
         assert int(r['promotores_nps'])+int(r['detratores_nps'])<=int(r['respostas_nps'])
         assert int(r['pedidos_atrasados'])<=int(r['pedidos'])
+
+
+def patch_state(teacher, code, **changes):
+    current = teacher.get(f'/api/rooms/{code}').json()
+    result = teacher.patch(f'/api/rooms/{code}', json={**changes, 'version': current['version']})
+    assert result.status_code == 200, result.text
+    return result.json()
+
+
+def test_teaching_modal_open_select_close_and_slide_change(setup):
+    _, teacher, student, _, code = setup
+    for card in range(3):
+        detail = {'kind': 'card', 'slide': 'entrada', 'card': card}
+        patch_state(teacher, code, presentation=detail)
+        assert student.get(f'/api/rooms/{code}').json()['presentation'] == detail
+    patch_state(teacher, code, presentation=None)
+    assert student.get(f'/api/rooms/{code}').json()['presentation'] is None
+    patch_state(teacher, code, presentation=detail)
+    assert patch_state(teacher, code, slide='clear')['presentation'] is None
+    for letter in 'CLEAR':
+        detail = {'kind': 'clear', 'slide': 'clear', 'letter': letter}
+        patch_state(teacher, code, presentation=detail)
+        assert student.get(f'/api/rooms/{code}').json()['presentation'] == detail
+
+
+def test_late_join_receives_modal_and_authoritative_timer(setup):
+    app, teacher, _, _, code = setup
+    detail = {'kind': 'card', 'slide': 'primeira-tentativa', 'card': 0}
+    state = patch_state(teacher, code, slide='primeira-tentativa', presentation=detail,
+                        timer_action='start', exercise='baseline')
+    with TestClient(app, headers=HEADERS) as newcomer:
+        joined = newcomer.post(f'/api/rooms/{code}/join', json={'nickname': 'Depois', 'privacy_ack': True}).json()['room']
+        assert joined['presentation'] == detail
+        assert joined['activity_timer'] == state['activity_timer']
+        assert joined['server_time'] >= state['server_time']
+
+
+def test_timer_pause_resume_restart_and_reset_keep_server_time(setup, monkeypatch):
+    _, teacher, student, _, code = setup
+    now = time.time()
+    monkeypatch.setattr('app.time.time', lambda: now)
+    started = patch_state(teacher, code, slide='primeira-tentativa', timer_action='start', exercise='baseline')['activity_timer']
+    assert started['duration'] == 180
+    assert started['ends_at'] == now + 180
+    now += 17.5
+    paused = patch_state(teacher, code, timer_action='pause')['activity_timer']
+    assert paused['remaining'] == 162.5 and paused['ends_at'] is None
+    now += 60
+    resumed = patch_state(teacher, code, timer_action='resume')['activity_timer']
+    assert resumed['id'] == started['id'] and resumed['ends_at'] == now + 162.5
+    patch_state(teacher, code, slide='clear')
+    assert student.get(f'/api/rooms/{code}').json()['activity_timer'] == resumed
+    now += 170
+    ended = patch_state(teacher, code, timer_action='pause')['activity_timer']
+    assert ended['remaining'] == 0
+    restarted = patch_state(teacher, code, slide='primeira-tentativa', timer_action='start', exercise='baseline')['activity_timer']
+    assert restarted['id'] != started['id']
+    assert patch_state(teacher, code, timer_action='reset')['activity_timer'] is None
+
+
+def test_shared_teaching_controls_require_facilitator(setup):
+    _, teacher, student, _, code = setup
+    current = teacher.get(f'/api/rooms/{code}').json()
+    for change in [dict(presentation={'kind': 'card', 'slide': 'entrada', 'card': 0}), dict(timer_action='reset')]:
+        assert student.patch(f'/api/rooms/{code}', json={**change, 'version': current['version']}).status_code == 403
+    assert teacher.get(f'/api/rooms/{code}').json()['version'] == current['version']
+
+
+@pytest.mark.parametrize('change', [
+    {'presentation': {'kind': 'card', 'slide': 'entrada', 'card': 3}},
+    {'presentation': {'kind': 'card', 'slide': 'entrada', 'card': True}},
+    {'presentation': {'kind': 'card', 'slide': 'ceo', 'card': 0}},
+    {'presentation': {'kind': 'review', 'slide': 'entrada'}},
+    {'slide': 'clear', 'presentation': {'kind': 'clear', 'slide': 'clear', 'letter': 'CL'}},
+    {'timer_action': 'start', 'exercise': 'baseline'},
+    {'timer_action': 'resume'},
+])
+def test_teaching_state_rejects_invalid_controls_atomically(setup, change):
+    _, teacher, _, _, code = setup
+    current = teacher.get(f'/api/rooms/{code}').json()
+    result = teacher.patch(f'/api/rooms/{code}', json={**change, 'version': current['version']})
+    assert result.status_code == 422
+    assert teacher.get(f'/api/rooms/{code}').json()['version'] == current['version']
+
+
+def test_existing_room_schema_is_migrated_without_losing_rooms(tmp_path):
+    from app import DECK_HASH
+    with sqlite3.connect(tmp_path/'workshop.sqlite3') as db:
+        db.execute('CREATE TABLE rooms (code TEXT PRIMARY KEY, title TEXT, slide TEXT, version INTEGER DEFAULT 1, revision INTEGER DEFAULT 0, closed INTEGER DEFAULT 0, created REAL, expires REAL, deck_hash TEXT)')
+        db.execute('INSERT INTO rooms(code,title,slide,created,expires,deck_hash) VALUES(?,?,?,?,?,?)',
+                   ('ABCDEFGHJK', 'Turma preservada', 'entrada', time.time(), time.time()+3600, DECK_HASH))
+    app = create_app(tmp_path, PASSWORD, 'http://testserver')
+    for _ in range(2):
+        with TestClient(app, headers=HEADERS) as teacher:
+            teacher.post('/api/login', json={'password': PASSWORD})
+            state = teacher.get('/api/rooms/ABCDEFGHJK').json()
+            assert state['title'] == 'Turma preservada'
+            assert state['presentation'] is None and state['activity_timer'] is None
