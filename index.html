@@ -22,6 +22,7 @@
     </nav>
   </header>
   <div class="session-bar"><span id="connection" role="status">Modo de estudo</span><span id="room-label"></span><button id="follow" class="text-button" data-action="follow" hidden>Seguir apresentador</button></div>
+  <aside id="live-timer" class="live-timer" aria-label="Contador da atividade" hidden></aside>
   <main id="stage" tabindex="-1" aria-label="Apresentação"></main>
   <footer class="bottom-bar">
     <div class="bottom-left"><span id="chapter"></span><button class="text-button" data-action="map">Ver roteiro</button></div>
@@ -34,6 +35,7 @@
     </nav>
   </footer>
   <dialog id="panel" aria-labelledby="panel-title"><header class="panel-header"><div><span class="eyebrow" id="panel-kicker">KEYCORE ACADEMY</span><h2 id="panel-title"></h2></div><button class="circle" data-action="close" aria-label="Fechar painel">×</button></header><div id="panel-body"></div></dialog>
+  <dialog id="detail-panel" aria-labelledby="detail-title"><header class="panel-header"><div><span class="eyebrow">PARA EXPLORAR EM CONJUNTO</span><h2 id="detail-title"></h2></div><button class="circle" data-action="close-detail" aria-label="Fechar explicação">×</button></header><div id="detail-body"></div></dialog>
   <div id="toast" role="status" aria-live="polite"></div>
   <noscript>Ative JavaScript para navegar no workshop. Os materiais estão na pasta resources do projeto.</noscript>
 </body>

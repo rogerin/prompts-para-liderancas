@@ -6,7 +6,7 @@ Workshop interativo de **2h30** para lideranças que querem usar IA para analisa
 
 A aprendizagem parte da **Núcleo Casa**, um varejo omnicanal inteiramente fictício. A turma investiga o mesmo negócio pelas perspectivas de CEO, CFO, COO, CMO e CHRO, melhora seus prompts e encerra com uma simulação de conselho.
 
-**23 slides · 33 prompts · 7 atividades em aula · 12 desafios adicionais na planilha · 5 perspectivas de liderança**
+**24 slides · 33 prompts · 7 atividades em aula · 12 desafios adicionais na planilha · 5 perspectivas de liderança**
 
 Quer realizar este workshop na sua empresa? [Converse com a KeyCore](https://keycore.com.br/agendar-um-cafe).
 
@@ -39,10 +39,14 @@ O conteúdo é voltado a gestores, executivos, coordenadores e equipes de negóc
 
 | Recurso | Detalhes |
 | --- | --- |
-| Apresentação interativa | 23 slides responsivos, indicador de progresso, roteiro, tela cheia e navegação por teclado. Atalhos não interferem nos formulários. |
+| Apresentação interativa | 24 slides responsivos, indicador de progresso, roteiro, tela cheia e navegação por teclado. Atalhos não interferem nos formulários. |
 | Biblioteca de prompts | 33 exemplos completos, com busca, categorias, indicação de uso e fontes necessárias. Permite copiar, baixar e usar o prompt em uma atividade. |
 | Salas com QR code | Criação e retomada de turmas, link de entrada, código de sala e contagem de participantes inscritos. |
 | Acompanhamento ao vivo | Atualização de slides por Server-Sent Events, reconexão e consulta periódica de estado quando a conexão falha. |
+| Leitura em projeção | Conteúdo principal de 20 a 28 px em telas grandes, contraste reforçado e composição que acomoda os 24 slides com contador nas resoluções verificadas. |
+| Cards explicativos | 71 cards com explicação, exemplo e pergunta de discussão; abertura e fechamento acompanham o facilitador ao vivo. |
+| Método CLEAR | Slide 05, após a tentativa inicial, com cinco princípios e um prompt cujo destaque acompanha a letra selecionada pelo facilitador. |
+| Contadores das atividades | Iniciar, pausar, retomar e zerar o tempo; estado persistido na sala, aviso visual e alarme sonoro habilitado por interação no navegador. |
 | Exploração individual | O participante pausa o acompanhamento, navega no conteúdo e retorna ao slide atual do facilitador. |
 | Tentativas e rascunhos | Registros de modelo, prompt, resultado, configurações e reflexão. Rascunhos de texto são guardados por sala e exercício na aba do navegador e podem ser baixados. |
 | Anexos | Até três arquivos por tentativa. Acesso depende das permissões do envio; anexos não entram no material público nem no rascunho. |
@@ -180,6 +184,7 @@ Varejo omnicanal fictício, com e-commerce, 12 lojas e B2B. A **NC-2026.1** cobr
 - [Dicionário, fórmulas e limites](resources/dados/LEIA-ME.md) e [documentos sintéticos](resources/dados/politicas-e-eventos.md).
 - [Kit completo](resources/kit-estudo-completo.zip).
 - [33 prompts em Markdown](resources/kit-prompts.md) e [biblioteca em JSON](resources/prompts.json).
+- [CLEAR: princípios e exemplo comentado](resources/clear.md).
 - [Canvas de prompt](resources/canvas-prompt.md) e [rubrica](resources/rubrica.md).
 
 ### Abas da planilha
@@ -244,7 +249,7 @@ Edite `content.json` e execute:
 python scripts/build_materials.py
 ```
 
-O comando atualiza `static/content.js`, `resources/prompts.json`, `resources/kit-prompts.md` e o ZIP. Não altera os CSVs nem reconstrói o XLSX. Mantenha os IDs estáveis. Alterar `content.json` muda a assinatura da apresentação: crie uma nova sala e não altere o conteúdo durante uma turma ativa.
+O comando atualiza `static/content.js`, `resources/prompts.json`, `resources/kit-prompts.md`, `resources/clear.md` e o ZIP. Não altera os CSVs nem reconstrói o XLSX. Mantenha os IDs estáveis. Alterar `content.json` muda a assinatura da apresentação: crie uma nova sala e não altere o conteúdo durante uma turma ativa.
 
 Para recriar os dados sintéticos com a semente fixa da NC-2026.1:
 

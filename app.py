@@ -35,6 +35,8 @@ CONTENT = json.loads((ROOT / 'content.json').read_text(encoding='utf-8'))
 DECK_HASH = hashlib.sha256((ROOT / 'content.json').read_bytes()).hexdigest()[:16]
 EXERCISES = {e['id'] for e in CONTENT['exercises']}
 SLIDES = {s['id'] for s in CONTENT['slides']}
+SLIDE_CONTENT = {s['id']: s for s in CONTENT['slides']}
+EXERCISE_CONTENT = {e['id']: e for e in CONTENT['exercises']}
 RUBRIC = {r['id'] for r in CONTENT['rubric']}
 MAX_FILE = 5 * 1024 * 1024
 MAX_JSON = 128 * 1024
@@ -102,6 +104,10 @@ def create_app(data_dir: Path | None = None, password: str | None = None,
                 CREATE INDEX IF NOT EXISTS sub_room ON submissions(room, exercise);
                 CREATE INDEX IF NOT EXISTS file_sub ON files(submission_id);
             ''')
+            columns = {row['name'] for row in c.execute('PRAGMA table_info(rooms)')}
+            for name in ('presentation', 'activity_timer'):
+                if name not in columns:
+                    c.execute(f'ALTER TABLE rooms ADD COLUMN {name} TEXT')
         cleanup()
 
     def erase_room(code: str, c: sqlite3.Connection) -> None:
@@ -248,6 +254,9 @@ def create_app(data_dir: Path | None = None, password: str | None = None,
         return {'code':room['code'],'title':room['title'],'slide':room['slide'],'version':room['version'],
                 'revision':room['revision'],'closed':bool(room['closed']),'registered':count,
                 'expires':room['expires'],'deck_hash':DECK_HASH,
+                'presentation':json.loads(room['presentation']) if room['presentation'] else None,
+                'activity_timer':json.loads(room['activity_timer']) if room['activity_timer'] else None,
+                'server_time':time.time(),
                 'join_url': f"{base}/?sala={room['code']}",
                 'local_url': parsed.hostname in {'localhost','127.0.0.1'}}
 
@@ -347,10 +356,52 @@ def create_app(data_dir: Path | None = None, password: str | None = None,
         selected=text(data,'slide',default=room['slide'])
         if selected not in SLIDES: raise HTTPException(422,'Slide inválido.')
         closed=flag(data,'closed',bool(room['closed']))
+        presentation = json.loads(room['presentation']) if room['presentation'] else None
+        if selected != room['slide']:
+            presentation = None
+        if 'presentation' in data:
+            presentation = data['presentation']
+            if presentation is not None:
+                if not isinstance(presentation, dict) or presentation.get('slide') != selected:
+                    raise HTTPException(422, 'O detalhe deve pertencer ao slide atual.')
+                kind = presentation.get('kind')
+                if kind == 'card':
+                    card = presentation.get('card')
+                    if type(card) is not int or not 0 <= card < len(SLIDE_CONTENT[selected]['cards']):
+                        raise HTTPException(422, 'Card inválido.')
+                    presentation = {'kind':'card', 'slide':selected, 'card':card}
+                elif kind == 'clear' and SLIDE_CONTENT[selected]['kind'] == 'clear':
+                    letter = presentation.get('letter')
+                    if not isinstance(letter, str) or letter not in list('CLEAR'):
+                        raise HTTPException(422, 'Letra CLEAR inválida.')
+                    presentation = {'kind':'clear', 'slide':selected, 'letter':letter}
+                else:
+                    raise HTTPException(422, 'Detalhe de apresentação inválido.')
+        timer = json.loads(room['activity_timer']) if room['activity_timer'] else None
+        if 'timer_action' in data:
+            action = data['timer_action']
+            now = time.time()
+            if action == 'start':
+                exercise = text(data, 'exercise')
+                if exercise not in EXERCISES or SLIDE_CONTENT[selected].get('exercise') != exercise:
+                    raise HTTPException(422, 'Inicie o contador na atividade do slide atual.')
+                duration = EXERCISE_CONTENT[exercise]['minutes'] * 60
+                timer = {'id':secrets.token_hex(12), 'exercise':exercise, 'duration':duration,
+                         'remaining':duration, 'ends_at':now+duration, 'status':'running'}
+            elif action == 'reset':
+                timer = None
+            elif action == 'pause' and timer and timer['status'] == 'running':
+                timer = {**timer, 'remaining':max(0, timer['ends_at']-now), 'ends_at':None, 'status':'paused'}
+            elif action == 'resume' and timer and timer['status'] == 'paused' and timer['remaining'] > 0:
+                timer = {**timer, 'ends_at':now+timer['remaining'], 'status':'running'}
+            else:
+                raise HTTPException(422, 'Ação indisponível para este contador.')
         expected=data.get('version')
         if type(expected) is not int: raise HTTPException(422,'Informe a versão atual da sala.')
         with db() as c:
-            result=c.execute('UPDATE rooms SET slide=?,closed=?,version=version+1 WHERE code=? AND version=?', (selected,int(closed),room['code'],expected))
+            result=c.execute('UPDATE rooms SET slide=?,closed=?,presentation=?,activity_timer=?,version=version+1 WHERE code=? AND version=?',
+                             (selected,int(closed),json.dumps(presentation) if presentation else None,
+                              json.dumps(timer) if timer else None,room['code'],expected))
             if result.rowcount!=1: raise HTTPException(409,'A sala mudou em outra tela. Atualize e tente novamente.')
         return state(get_room(code))
 
